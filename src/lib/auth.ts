@@ -16,7 +16,8 @@ export async function auth() {
   
   // Sync Supabase User with Prisma User automatically
   let defaultRole = 'CLIENT'
-  if (process.env.ADMIN_EMAILS && process.env.ADMIN_EMAILS.includes(user.email!)) {
+  const adminString = (process.env.ADMIN_EMAILS || '').toLowerCase()
+  if (adminString.includes(user.email!.toLowerCase())) {
     defaultRole = 'ADMIN'
   }
 

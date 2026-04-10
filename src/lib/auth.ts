@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server'
+import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
@@ -7,6 +7,33 @@ export type UserRole = 'CLIENT' | 'BARBER' | 'ADMIN'
 export interface AuthenticatedUser {
   userId: string
   role: UserRole
+}
+
+export async function auth() {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { userId: null }
+  
+  // Sync Supabase User with Prisma User automatically
+  let defaultRole = 'CLIENT'
+  if (process.env.ADMIN_EMAILS && process.env.ADMIN_EMAILS.includes(user.email!)) {
+    defaultRole = 'ADMIN'
+  }
+
+  const dbUser = await prisma.user.upsert({
+    where: { email: user.email! },
+    update: {
+        // Here we could update name or picture if wanted
+    },
+    create: {
+      id: user.id, // Keep IDs perfectly in sync
+      email: user.email!,
+      name: user.user_metadata?.full_name || user.email!.split('@')[0],
+      role: defaultRole as UserRole
+    }
+  })
+
+  return { userId: dbUser.id }
 }
 
 /**

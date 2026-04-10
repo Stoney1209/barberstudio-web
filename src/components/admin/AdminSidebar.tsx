@@ -2,8 +2,8 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
 import { motion } from 'framer-motion'
+import { SignOutButton } from '@/components/ui/SignOutButton'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: '📊' },
@@ -92,21 +92,20 @@ export const AdminSidebar: React.FC = () => {
         </nav>
 
         <div className="p-6 border-t border-gold/5 bg-black/40 relative">
-          <div className="flex items-center gap-4 p-3 rounded-lg border border-gold/5 glass-hover">
-             <UserButton 
-                appearance={{
-                  elements: {
-                    userButtonAvatarBox: "w-10 h-10 border border-gold/20"
-                  }
-                }}
-             />
-             <div className="flex flex-col min-w-0">
+          <div className="flex items-center gap-3 p-3 rounded-lg border border-gold/5 glass-hover">
+             <div className="w-10 h-10 border border-gold/20 rounded-full flex items-center justify-center bg-zinc-900">
+               <span className="text-gold font-bold">A</span>
+             </div>
+             <div className="flex flex-col min-w-0 pr-2">
                <span className="text-xs text-white font-medium truncate">Administrador</span>
-               <div className="flex items-center gap-1.5">
+               <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                   <span className="text-[9px] text-gold/50 uppercase tracking-widest">Online</span>
                </div>
              </div>
+          </div>
+          <div className="mt-4 text-center">
+            <SignOutButton className="text-[10px] text-red-400 hover:text-red-300 uppercase tracking-widest font-bold transition-colors" />
           </div>
         </div>
       </aside>

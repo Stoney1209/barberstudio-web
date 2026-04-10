@@ -1,26 +1,7 @@
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { getPublicApiRatelimit } from '@/lib/rate-limit'
+import { updateSession } from '@/lib/supabase/middleware'
 
-/**
- * Routes that skip Clerk auth.protect() — handlers must enforce auth/roles themselves.
- * Keep this list explicit so new /api routes default to requiring a session at the edge.
- */
-const isPublicRoute = createRouteMatcher([
-  '/',
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/api/auth/me',
-  '/api/webhooks/clerk(.*)',
-  '/api/services(.*)',
-  '/api/barbers(.*)',
-  '/api/appointments',
-  '/api/availability(.*)',
-  '/api/reviews(.*)',
-  '/api/galeria(.*)',
-])
-
-/** Subset of public API used for reads; rate-limited when Upstash is configured. */
 const publicApiRateLimitMatchers = [
   /^\/api\/services(\/|$)/,
   /^\/api\/barbers(\/|$)/,
@@ -34,7 +15,22 @@ function shouldRateLimitPublicApi(pathname: string) {
   return publicApiRateLimitMatchers.some((re) => re.test(pathname))
 }
 
-export default clerkMiddleware(async (auth, req) => {
+const isPublicRoute = (pathname: string) => {
+  if (pathname === '/') return true
+  if (pathname.startsWith('/login')) return true
+  if (pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up')) return true
+  if (pathname.startsWith('/auth')) return true // For callback routes
+  if (pathname.startsWith('/api/auth')) return true
+  if (pathname.startsWith('/api/services')) return true
+  if (pathname.startsWith('/api/barbers')) return true
+  if (pathname === '/api/appointments') return true // Creación es semi-pública y protegida en su handler si hace falta
+  if (pathname.startsWith('/api/availability')) return true
+  if (pathname.startsWith('/api/reviews')) return true
+  if (pathname.startsWith('/api/galeria')) return true
+  return false
+}
+
+export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname
 
   if (pathname.startsWith('/api/') && shouldRateLimitPublicApi(pathname)) {
@@ -53,10 +49,21 @@ export default clerkMiddleware(async (auth, req) => {
     }
   }
 
-  if (!isPublicRoute(req)) {
-    await auth.protect()
+  const { supabaseResponse, user } = await updateSession(req)
+
+  if (!isPublicRoute(pathname)) {
+    if (!user) {
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+      } else {
+        const loginUrl = new URL('/login', req.url)
+        return NextResponse.redirect(loginUrl)
+      }
+    }
   }
-})
+
+  return supabaseResponse
+}
 
 export const config = {
   matcher: ['/((?!.*\\..*|_next).*)', '/', '/(api|trpc)(.*)'],

@@ -2,14 +2,16 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { SignInButton, UserButton, useUser } from '@clerk/nextjs'
 import { motion, useScroll, useTransform } from 'framer-motion'
+import { createClient } from '@/lib/supabase/client'
+import { SignOutButton } from '@/components/ui/SignOutButton'
 
 export const ClerkHeader: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [session, setSession] = useState<any>(null)
+  const [loadingUsr, setLoadingUsr] = useState(true)
   const pathname = usePathname()
-  const { isLoaded, isSignedIn } = useUser()
 
   const isAdminPath = pathname.startsWith('/dashboard') || pathname.startsWith('/admin')
   
@@ -21,7 +23,26 @@ export const ClerkHeader: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setLoadingUsr(false)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
   if (isAdminPath) return null
+
+  const isLoaded = !loadingUsr
+  const isSignedIn = !!session
 
   return (
     <motion.header 
@@ -63,14 +84,12 @@ export const ClerkHeader: React.FC = () => {
           
           <div className="flex items-center gap-6 border-l border-white/10 pl-8 ml-4">
             {isLoaded && !isSignedIn && (
-              <SignInButton mode="modal">
-                <button className="text-[10px] text-white/40 hover:text-gold uppercase tracking-[0.3em] font-bold">
-                  Login
-                </button>
-              </SignInButton>
+              <Link href="/login" className="text-[10px] text-white/40 hover:text-gold uppercase tracking-[0.3em] font-bold">
+                Login
+              </Link>
             )}
             {isLoaded && isSignedIn && (
-              <UserButton appearance={{ elements: { userButtonAvatarBox: "w-8 h-8 rounded-sm border border-gold/20" } }} />
+               <SignOutButton />
             )}
           </div>
         </nav>
@@ -92,7 +111,19 @@ export const ClerkHeader: React.FC = () => {
            <Link href="/servicios" className="text-sm uppercase tracking-widest text-white">Servicios</Link>
            <Link href="/galeria" className="text-sm uppercase tracking-widest text-white">Galería</Link>
            <Link href="/resenas" className="text-sm uppercase tracking-widest text-white">Reseñas</Link>
+           {isLoaded && !isSignedIn && (
+              <Link href="/login" className="text-sm uppercase tracking-widest text-gold">Iniciar Sesión</Link>
+           )}
+           {isLoaded && isSignedIn && (
+              <Link href="/mis-reservas" className="text-sm uppercase tracking-widest text-gold">Mis Citas</Link>
+           )}
            <Link href="/reservar" className="btn-gold py-4 text-center">Reservar Cita</Link>
+           
+           {isLoaded && isSignedIn && (
+               <div className="pt-4 border-t border-white/5">
+                 <SignOutButton className="text-sm uppercase tracking-widest text-white/40" />
+               </div>
+           )}
         </motion.div>
       )}
     </motion.header>

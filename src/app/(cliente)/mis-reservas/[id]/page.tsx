@@ -1,5 +1,5 @@
 import React from 'react'
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'

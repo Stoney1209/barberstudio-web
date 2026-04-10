@@ -1,0 +1,133 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String     @id @default(uuid())
+  name      String?
+  email     String     @unique
+  phone     String?
+  role      UserRole
+  createdAt DateTime   @default(now())
+
+  // Relations
+  appointmentsClient Appointment[] @relation("ClientAppointments")
+  appointmentsBarber Appointment[] @relation("BarberAppointments")
+  reviews     Review[]
+  galleries   Gallery[]
+  availabilities Availability[] @relation("BarberAvailability")
+
+  @@index([role])
+}
+
+enum UserRole {
+  ADMIN
+  BARBER
+  CLIENT
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  duration    Int      // minutes
+  imageUrl    String?
+  category    ServiceCategory
+
+  // Relations
+  appointments Appointment[]
+}
+
+enum ServiceCategory {
+  FADE
+  CLASSIC
+  GRADIENT
+  BEARD
+  SHAVE
+}
+
+model Appointment {
+  id            String            @id @default(uuid())
+  clientId      String
+  barberId      String
+  serviceId     String
+  date          DateTime          // date (day-level granularity)
+  startTime     String            // HH:mm
+  endTime       String            // HH:mm
+  status        AppointmentStatus
+  paymentStatus PaymentStatus
+  notes         String?
+
+  // Relations
+  client  User      @relation("ClientAppointments", fields: [clientId], references: [id])
+  barber  User      @relation("BarberAppointments", fields: [barberId], references: [id])
+  service Service   @relation(fields: [serviceId], references: [id])
+  review  Review?
+
+  @@index([barberId, date, status])
+  @@index([clientId, date])
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  PARTIALLY_PAID
+  CANCELLED
+}
+
+model Review {
+  id            String    @id @default(uuid())
+  appointmentId String @unique
+  clientId      String
+  rating        Int       // 1-5
+  comment       String?
+  createdAt     DateTime  @default(now())
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+  client      User        @relation(fields: [clientId], references: [id])
+}
+
+model Availability {
+  id         String @id @default(uuid())
+  barberId   String
+  dayOfWeek  Int    // 0 (Sun) - 6 (Sat)
+  startTime  String // HH:mm
+  endTime    String // HH:mm
+  isActive   Boolean @default(true)
+
+  barber User @relation("BarberAvailability", fields: [barberId], references: [id])
+
+  @@unique([barberId, dayOfWeek])
+  @@index([barberId, dayOfWeek])
+  @@index([barberId, dayOfWeek, startTime, endTime])
+}
+
+model Gallery {
+  id        String  @id @default(uuid())
+  imageUrl  String
+  caption   String?
+  category  GalleryCategory
+  barberId  String?
+  createdAt DateTime @default(now())
+
+  barber User? @relation(fields: [barberId], references: [id])
+}
+
+enum GalleryCategory {
+  FADE
+  CLASSIC
+  GRADIENT
+  BEARD
+}

@@ -1,0 +1,16 @@
+{
+  "project": {
+    "name": "BaberNew",
+    "version": "1.0.0",
+    "description": "Barbershop appointment booking system with Next.js, Prisma, and Tailwind CSS"
+  },
+  "agents": {
+    "enabled": true,
+    "skillsDirectory": ".agents/skills",
+    "rulesDirectory": ".opencode/rules"
+  },
+  "context7": {
+    "enabled": true,
+    "autoApply": true
+  }
+}

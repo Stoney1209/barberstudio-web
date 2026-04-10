@@ -33,6 +33,21 @@ export default function LoginPage() {
           password,
         })
         if (error) throw error
+
+        try {
+          const res = await fetch('/api/auth/me')
+          if (res.ok) {
+            const data = await res.json()
+            if (data?.user?.role === 'ADMIN') {
+              router.push('/dashboard')
+              router.refresh()
+              return
+            }
+          }
+        } catch (e) {
+          // Ignorar error y mandar a inicio
+        }
+
         router.push('/')
         router.refresh()
       }

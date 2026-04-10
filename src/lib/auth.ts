@@ -23,7 +23,7 @@ export async function auth() {
   const dbUser = await prisma.user.upsert({
     where: { email: user.email! },
     update: {
-        // Here we could update name or picture if wanted
+        role: defaultRole === 'ADMIN' ? 'ADMIN' : undefined
     },
     create: {
       id: user.id, // Keep IDs perfectly in sync

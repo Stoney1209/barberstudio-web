@@ -166,16 +166,6 @@ export default function AdminBarbersClient({ initialBarbers }: { initialBarbers:
                     <motion.button 
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => setAvailabilityBarber({ id: b.id, name: b.name || '' })}
-                      className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-white/40 hover:text-white transition-all font-bold p-2"
-                    >
-                      <Clock size={10} className="text-gold/40" />
-                      Horarios
-                    </motion.button>
-
-                    <motion.button 
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
                       onClick={() => handleDelete(b.id)}
                       className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-muted/20 hover:text-red-400 transition-all p-2 ml-auto"
                     >
@@ -303,6 +293,9 @@ export default function AdminBarbersClient({ initialBarbers }: { initialBarbers:
                barberName={availabilityBarber.name}
                onClose={() => setAvailabilityBarber(null)}
             />
+)}
+          </motion.div>
+            </div>
           )}
         </AnimatePresence>
       </div>

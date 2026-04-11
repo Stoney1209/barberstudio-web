@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import { LandingContent } from '@/components/landing/LandingContent'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Landing() {
   const services = await prisma.service.findMany({
     take: 6,

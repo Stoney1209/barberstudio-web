@@ -14,10 +14,9 @@ export async function auth() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { userId: null }
   
-  // Sync Supabase User with Prisma User automatically
-  let defaultRole = 'CLIENT'
+  let defaultRole: UserRole = 'CLIENT'
   const adminString = (process.env.ADMIN_EMAILS || '').toLowerCase()
-  if (adminString.includes(user.email!.toLowerCase())) {
+  if (adminString.includes(user.email?.toLowerCase() || '')) {
     defaultRole = 'ADMIN'
   }
 
@@ -27,20 +26,16 @@ export async function auth() {
         role: defaultRole === 'ADMIN' ? 'ADMIN' : undefined
     },
     create: {
-      id: user.id, // Keep IDs perfectly in sync
+      id: user.id,
       email: user.email!,
       name: user.user_metadata?.full_name || user.email!.split('@')[0],
-      role: defaultRole as UserRole
+      role: defaultRole
     }
   })
 
   return { userId: dbUser.id }
 }
 
-/**
- * Verifica que haya una sesión activa.
- * Devuelve { userId } o una NextResponse 401.
- */
 export async function requireAuth(): Promise<{ userId: string } | NextResponse> {
   const { userId } = await auth()
   if (!userId) {
@@ -49,10 +44,6 @@ export async function requireAuth(): Promise<{ userId: string } | NextResponse> 
   return { userId }
 }
 
-/**
- * Verifica sesión activa Y que el rol del usuario en BD sea uno de los permitidos.
- * Devuelve { userId, role } o una NextResponse 401/403.
- */
 export async function requireRole(
   allowedRoles: UserRole[]
 ): Promise<AuthenticatedUser | NextResponse> {
@@ -73,10 +64,6 @@ export async function requireRole(
   return { userId, role: dbUser.role as UserRole }
 }
 
-/**
- * Obtiene el usuario de BD asociado a la sesión activa.
- * Devuelve el user o null si no hay sesión / no existe en BD.
- */
 export async function getSessionUser() {
   const { userId } = await auth()
   if (!userId) return null

@@ -16,9 +16,8 @@ Pasos de instalación y arranque
 2) Configurar la app
 - Copia .env.example a .env.local y ajusta:
 - DATABASE_URL="postgresql://barber:barber@localhost:5432/barberstudio"
-- NEXT_PUBLIC_CLERK_FRONTEND_API="https://rare-lynx-68.clerk.accounts.dev"
-- CLERK_API_KEY (clave de Clerk)
-- NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY (opcional)
+- NEXT_PUBLIC_SUPABASE_URL="https://your-project.supabase.co"
+- NEXT_PUBLIC_SUPABASE_ANON_KEY="tu-anon-key"
 - CLOUDINARY_HOST, SMTP, etc. según necesites
 
 3) Instalar dependencias y generar clientes

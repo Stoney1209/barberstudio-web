@@ -4,7 +4,7 @@
 - **Framework**: Next.js 14 (App Router) + TypeScript
 - **Database**: PostgreSQL + Prisma ORM
 - **Styling**: Tailwind CSS
-- **Auth**: Clerk
+- **Auth**: Supabase Auth
 - **Images**: Cloudinary
 - **Email**: SMTP (configurable)
 
@@ -12,7 +12,7 @@
 
 ```bash
 # Setup
-cp .env.example .env  # Configure DATABASE_URL and other vars
+cp .env.example .env  # Configure DATABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY
 npx prisma generate   # Generate Prisma client
 npx prisma db push    # Push schema to database
 
@@ -27,27 +27,30 @@ npx prisma studio     # Open Prisma admin GUI
 - `src/app/` - Next.js App Router pages and API routes
 - `prisma/schema.prisma` - Database schema (single source of truth)
 - `src/lib/prisma.ts` - Prisma client singleton
+- `src/lib/supabase/` - Supabase client/server/browser clients
+- `src/lib/auth.ts` - Auth helpers (getUser, requireAuth)
 
 ## Important Notes
 - API routes use Zod for input validation (see `src/app/api/appointments/route.ts`)
 - Prisma client is a singleton in dev mode (see `src/lib/prisma.ts`)
 - The schema uses PostgreSQL-specific types (`@db.Decimal`)
+- Supabase Auth uses email/password signup and login
+- Middleware handles session refresh (see `src/middleware.ts`)
 
 ## Env Required
 - `DATABASE_URL` - PostgreSQL connection string (required)
-- `NEXT_PUBLIC_CLERK_FRONTEND_API` - Clerk config
+- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anon key
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (server-side only)
 - `CLOUDINARY_*` - Image upload (optional)
 - `SMTP_*` - Email notifications (optional)
 
 ## Skills Installed
 
-### Authentication (Clerk)
-- **clerk**: Authentication router - use for any Clerk-related task
-- **clerk-setup**: Adding Clerk to project
-- **clerk-custom-ui**: Custom sign-in/sign-up UI
-- **clerk-orgs**: Organizations (multi-tenant)
-- **clerk-testing**: E2E testing for Clerk
-- **clerk-webhooks**: Webhook handlers
+### Authentication (Supabase)
+- Uses Supabase Auth with `@supabase/ssr` for SSR support
+- Custom login page at `/login` with sign up/sign in
+- Session management via cookies in middleware
 
 ### Database (Prisma)
 - **prisma-cli**: Prisma commands (migrate, generate, studio)
@@ -63,7 +66,7 @@ npx prisma studio     # Open Prisma admin GUI
 
 ### Frontend
 - **frontend-design**: Production-grade UI design
-- **tail wand-css-patterns**: Tailwind CSS utilities
+- **tailwind-css-patterns**: Tailwind CSS utilities
 - **accessibility**: WCAG 2.2 audit
 - **seo**: Search engine optimization
 

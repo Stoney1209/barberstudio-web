@@ -85,18 +85,25 @@ jest.mock('@/lib/prisma', () => ({
   },
 }))
 
-jest.mock('@clerk/nextjs/server', () => {
-  const clerkUser = {
-    firstName: 'Test',
-    lastName: 'User',
-    emailAddresses: [{ emailAddress: 'clerk@example.com' }],
-    phoneNumbers: [] as { phoneNumber: string }[],
-    imageUrl: 'https://img.clerk.com/x',
-  }
-  const getUser = jest.fn(() => Promise.resolve(clerkUser))
-  return {
-    auth: jest.fn(() => Promise.resolve({ userId: 'test-user-id' })),
-    currentUser: jest.fn(() => Promise.resolve({ id: 'test-user-id', emailAddresses: [{ emailAddress: 'test@example.com' }] })),
-    clerkClient: jest.fn(() => Promise.resolve({ users: { getUser } })),
-  }
-})
+jest.mock('@supabase/ssr', () => ({
+  createServerClient: jest.fn(() => ({
+      auth: {
+        getUser: jest.fn().mockResolvedValue({
+          data: { user: { id: 'test-user-id', email: 'test@example.com' } },
+          error: null,
+        }),
+      },
+      cookies: {
+        get: jest.fn(),
+        set: jest.fn(),
+        remove: jest.fn(),
+      },
+    })),
+  createBrowserClient: jest.fn(() => ({
+      auth: {
+        getSession: jest.fn().mockResolvedValue({ data: { session: { user: { id: 'test-user-id' } } }, error: null }),
+        onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
+        signOut: jest.fn().mockResolvedValue({ error: null }),
+      },
+    })),
+}))

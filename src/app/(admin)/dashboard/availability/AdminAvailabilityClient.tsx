@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
-  Clock, Calendar, CheckCircle, Save, User, 
-  ChevronLeft, ChevronRight, Zap, Moon, Sun,
-  Coffee, Scissors, RotateCcw
+  Clock, Save, User, 
+  Zap, Moon, Sun, Coffee,
+  ChevronDown, Search, X
 } from 'lucide-react'
 
 type Barber = {
@@ -44,8 +44,103 @@ const PRESET_SCHEDULES = [
   { label: 'Mañana', start: '09:00', end: '14:00', icon: Zap },
   { label: 'Tarde', start: '14:00', end: '19:00', icon: Sun },
   { label: 'Completo', start: '09:00', end: '21:00', icon: Clock },
-  { label: 'Medio día', start: '10:00', end: '18:00', icon: Coffee },
+  { label: 'Medio', start: '10:00', end: '18:00', icon: Coffee },
 ]
+
+interface TimeSelectProps {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  disabled?: boolean
+  color?: 'gold' | 'white'
+}
+
+function TimeSelect({ label, value, onChange, disabled, color = 'white' }: TimeSelectProps) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const ref = useRef<HTMLDivElement>(null)
+
+  const filteredSlots = TIME_SLOTS.filter(t => 
+    t.includes(search) || search === ''
+  )
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false)
+        setSearch('')
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  return (
+    <div className="flex flex-col gap-2" ref={ref}>
+      <label className="text-[10px] text-muted/50 uppercase tracking-widest">{label}</label>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => !disabled && setOpen(!open)}
+          disabled={disabled}
+          className={`
+            w-full flex items-center justify-between gap-2 px-4 py-3 
+            bg-black/40 border border-gold/10 text-lg font-display
+            ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-gold/30'}
+            ${open ? 'border-gold/30' : ''}
+            transition-all
+            ${color === 'gold' ? 'text-gold' : 'text-white'}
+          `}
+        >
+          <span>{value}</span>
+          <ChevronDown size={16} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+        </button>
+
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute z-50 w-full mt-1 bg-surface-2 border border-gold/20 rounded-lg shadow-xl overflow-hidden"
+            >
+              <div className="p-2 border-b border-gold/10">
+                <div className="flex items-center gap-2 px-2 py-1 bg-black/40 rounded">
+                  <Search size={12} className="text-muted/40" />
+                  <input
+                    type="text"
+                    placeholder="Buscar..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="flex-1 bg-transparent text-sm text-white placeholder-muted/40 outline-none"
+                  />
+                  {search && (
+                    <button onClick={() => setSearch('')}><X size={12} className="text-muted/40" /></button>
+                  )}
+                </div>
+              </div>
+              <div className="max-h-48 overflow-y-auto py-1">
+                {filteredSlots.map(t => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => { onChange(t); setOpen(false); setSearch('') }}
+                    className={`
+                      w-full px-4 py-2 text-left text-sm hover:bg-gold/10 transition-colors
+                      ${value === t ? 'text-gold bg-gold/5' : 'text-white/70'}
+                    `}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
 
 export default function AdminAvailabilityClient({ initialBarbers }: { initialBarbers: Barber[] }) {
   const [selectedBarberId, setSelectedBarberId] = useState<string>(initialBarbers[0]?.id || '')
@@ -148,19 +243,19 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
         )}
       </AnimatePresence>
 
-      <div className="max-w-6xl mx-auto">
-        <header className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gold/5 pb-6">
+      <div className="max-w-4xl mx-auto">
+        <header className="mb-8 md:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gold/5 pb-4">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
             <p className="text-gold/60 text-xs uppercase tracking-[0.4em] mb-2">Panel</p>
-            <h1 className="text-4xl md:text-5xl font-display text-white italic">Horarios</h1>
+            <h1 className="text-3xl md:text-4xl font-display text-white italic">Horarios</h1>
           </motion.div>
 
-          <div className="relative group min-w-[200px]">
-            <User size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-gold/40" />
+          <div className="relative group min-w-[180px]">
+            <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold/40" />
             <select
               value={selectedBarberId}
               onChange={(e) => setSelectedBarberId(e.target.value)}
-              className="w-full bg-surface-2/40 border border-gold/10 p-3 pl-11 text-xs tracking-widest text-white outline-none focus:border-gold/50 appearance-none transition-all font-bold"
+              className="w-full bg-surface-2/40 border border-gold/10 p-2.5 pl-9 text-xs tracking-widest text-white outline-none focus:border-gold/50 appearance-none transition-all font-bold"
             >
               {initialBarbers.map(b => (
                 <option key={b.id} value={b.id} className="bg-surface-2">{b.name || b.email}</option>
@@ -169,7 +264,7 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
           </div>
         </header>
 
-        <div className="grid grid-cols-7 gap-2 mb-6">
+        <div className="grid grid-cols-7 gap-1 mb-6">
           {DAYS.map((day, idx) => {
             const avail = availabilities[idx]
             const isActive = avail?.isActive
@@ -179,7 +274,7 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
                 key={day.key}
                 onClick={() => setActiveDay(idx)}
                 className={`
-                  relative p-3 md:p-4 border transition-all duration-300 flex flex-col items-center gap-1
+                  relative p-2 md:p-3 border transition-all duration-300 flex flex-col items-center gap-1
                   ${activeDay === idx 
                     ? 'border-gold bg-gold/5 text-gold' 
                     : isActive 
@@ -188,10 +283,10 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
                   }
                 `}
               >
-                <Icon size={14} />
-                <span className="text-[10px] uppercase tracking-wider">{day.short}</span>
+                <Icon size={12} />
+                <span className="text-[9px] uppercase tracking-wider">{day.short}</span>
                 {isActive && (
-                  <div className="absolute top-1 right-1 w-2 h-2 bg-gold rounded-full shadow-glow" />
+                  <div className="absolute top-1 right-1 w-1.5 h-1.5 bg-gold rounded-full shadow-glow" />
                 )}
               </button>
             )
@@ -199,130 +294,101 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
         </div>
 
         {loading ? (
-          <div className="p-32 text-center">
-            <div className="w-12 h-12 border-2 border-gold/10 border-t-gold rounded-full animate-spin mx-auto shadow-glow" />
+          <div className="p-20 text-center">
+            <div className="w-8 h-8 border-2 border-gold/10 border-t-gold rounded-full animate-spin mx-auto" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <motion.div
-                key={activeDay}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="glass border border-gold/10 p-6 md:p-8"
-              >
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h2 className="text-3xl font-display text-white">{DAYS[activeDay].name}</h2>
-                    <p className="text-gold/60 text-xs uppercase tracking-widest mt-1">
-                      {getIntervalLabel(currentDay.startTime, currentDay.endTime)} horas configuradas
-                    </p>
-                  </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <motion.div
+              key={activeDay}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="glass border border-gold/10 p-5"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-xl font-display text-white">{DAYS[activeDay].name}</h2>
+                  <p className="text-gold/60 text-[10px] uppercase tracking-widest mt-0.5">
+                    {getIntervalLabel(currentDay.startTime, currentDay.endTime)} hrs
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleDayToggle(activeDay)}
+                  className={`
+                    px-3 py-1.5 text-[10px] uppercase tracking-[0.2em] font-bold border transition-all
+                    ${currentDay.isActive 
+                      ? 'bg-gold text-primary border-gold hover:bg-gold-light' 
+                      : 'text-muted border-gold/20 hover:border-gold/50'
+                    }
+                  `}
+                >
+                  {currentDay.isActive ? 'Activo' : 'Inactivo'}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <TimeSelect
+                  label="Entrada"
+                  value={currentDay.startTime}
+                  onChange={(v) => handleTimeChange(activeDay, v, currentDay.endTime)}
+                  disabled={!currentDay.isActive}
+                  color="gold"
+                />
+                <TimeSelect
+                  label="Salida"
+                  value={currentDay.endTime}
+                  onChange={(v) => handleTimeChange(activeDay, currentDay.startTime, v)}
+                  disabled={!currentDay.isActive}
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {PRESET_SCHEDULES.map((preset) => (
                   <button
-                    onClick={() => handleDayToggle(activeDay)}
-                    className={`
-                      px-6 py-3 text-xs uppercase tracking-[0.2em] font-bold border transition-all
-                      ${currentDay.isActive 
-                        ? 'bg-gold text-primary border-gold hover:bg-gold-light' 
-                        : 'text-muted border-gold/20 hover:border-gold/50'
-                      }
-                    `}
+                    key={preset.label}
+                    onClick={() => applyPreset(preset, activeDay)}
+                    disabled={!currentDay.isActive}
+                    className="flex items-center gap-1 px-2 py-1 border border-gold/10 text-[9px] uppercase tracking-wider text-muted hover:border-gold/50 hover:text-gold transition-all disabled:opacity-30"
                   >
-                    {currentDay.isActive ? 'Activo' : 'Inactivo'}
+                    <preset.icon size={10} />
+                    {preset.label}
                   </button>
-                </div>
+                ))}
+              </div>
 
-                <div className="flex flex-col gap-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-2">
-                      <label className="text-[10px] text-muted/50 uppercase tracking-widest">Entrada</label>
-                      <select
-                        value={currentDay.startTime}
-                        onChange={(e) => handleTimeChange(activeDay, e.target.value, currentDay.endTime)}
-                        disabled={!currentDay.isActive}
-                        className="bg-black/40 border border-gold/10 p-4 text-xl font-display text-gold outline-none focus:border-gold/30 transition-all disabled:opacity-30"
-                      >
-                        {TIME_SLOTS.map(t => (
-                          <option key={t} value={t}>{t}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="text-[10px] text-muted/50 uppercase tracking-widest">Salida</label>
-                      <select
-                        value={currentDay.endTime}
-                        onChange={(e) => handleTimeChange(activeDay, currentDay.startTime, e.target.value)}
-                        disabled={!currentDay.isActive}
-                        className="bg-black/40 border border-gold/10 p-4 text-xl font-display text-white outline-none focus:border-gold/30 transition-all disabled:opacity-30"
-                      >
-                        {TIME_SLOTS.map(t => (
-                          <option key={t} value={t}>{t}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
+              <div className="p-3 bg-gold/5 border border-gold/10 flex items-center gap-2 text-sm">
+                <Clock size={12} className="text-gold" />
+                <span className="text-white font-display">
+                  {currentDay.startTime} — {currentDay.endTime}
+                </span>
+              </div>
+            </motion.div>
 
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    {PRESET_SCHEDULES.map((preset) => (
-                      <button
-                        key={preset.label}
-                        onClick={() => applyPreset(preset, activeDay)}
-                        disabled={!currentDay.isActive}
-                        className="flex items-center gap-2 px-4 py-2 border border-gold/10 text-xs uppercase tracking-wider text-muted hover:border-gold/50 hover:text-gold transition-all disabled:opacity-30"
-                      >
-                        <preset.icon size={12} />
-                        {preset.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-8 p-4 bg-gold/5 border border-gold/10">
-                  <p className="text-[10px] text-muted/50 uppercase tracking-widest mb-3">Vista previa</p>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Clock size={14} className="text-gold" />
-                    <span className="text-white font-display">
-                      {currentDay.startTime} — {currentDay.endTime}
-                    </span>
-                    {currentDay.isActive && (
-                      <span className="text-gold/60 text-xs ml-2">({getIntervalLabel(currentDay.startTime, currentDay.endTime)}h)</span>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-
-            <div className="space-y-4">
+            <div className="space-y-3">
               <button
                 onClick={copyToAll}
                 disabled={!currentDay.isActive}
-                className="w-full p-4 border border-gold/10 text-xs uppercase tracking-wider text-muted hover:border-gold/50 hover:text-gold transition-all flex items-center justify-center gap-2 disabled:opacity-30"
+                className="w-full py-2.5 border border-gold/10 text-[10px] uppercase tracking-wider text-muted hover:border-gold/50 hover:text-gold transition-all flex items-center justify-center gap-2 disabled:opacity-30"
               >
-                <RotateCcw size={14} />
-                Copiar a todos los días
+                <span>Copiar a todos los días</span>
               </button>
 
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="w-full py-4 bg-gold text-primary text-xs uppercase tracking-[0.3em] font-bold hover:bg-gold-light transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 bg-gold text-primary text-xs uppercase tracking-[0.3em] font-bold hover:bg-gold-light transition-all flex items-center justify-center gap-2"
               >
-                {saving ? (
-                  <div className="w-4 h-4 border border-primary/30 border-t-primary rounded-full animate-spin" />
-                ) : (
-                  <Save size={14} />
-                )}
-                {saving ? 'Guardando...' : 'Guardar todo'}
+                {saving ? 'Guardando...' : 'Guardar cambios'}
               </button>
 
               <div className="glass border border-gold/5 p-4">
-                <p className="text-[10px] text-muted/40 uppercase tracking-widest mb-3">Resumen</p>
-                <div className="space-y-2 text-xs">
+                <p className="text-[9px] text-muted/40 uppercase tracking-widest mb-2">Resumen semanal</p>
+                <div className="grid grid-cols-2 gap-1 text-[10px]">
                   {availabilities.map((a, i) => (
                     <div key={i} className="flex justify-between">
-                      <span className={a.isActive ? 'text-white/80' : 'text-muted/30'}>{DAYS[i].short}</span>
+                      <span className={a.isActive ? 'text-white/70' : 'text-muted/30'}>{DAYS[i].short}</span>
                       <span className={a.isActive ? 'text-gold' : 'text-muted/30'}>
-                        {a.isActive ? `${a.startTime}–${a.endTime}` : '—'}
+                        {a.isActive ? `${a.startTime}-${a.endTime}` : '—'}
                       </span>
                     </div>
                   ))}

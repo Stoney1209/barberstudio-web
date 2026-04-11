@@ -11,6 +11,8 @@ import {
 
 const SLOT_DURATION = SLOT_STEP_MINUTES
 
+const CACHE_MAX_AGE = 30 // seconds
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -42,15 +44,22 @@ export async function GET(req: NextRequest) {
     const dayWindow = await resolveBarberDayWindow(barberId, dateObj)
 
     if (dayWindow.status === 'closed') {
-      return NextResponse.json({
-        barber,
-        date,
-        durationRequested,
-        closedDay: true,
-        message: 'El barbero no atiende este día',
-        workingHours: null,
-        availableSlots: [],
-      })
+      return NextResponse.json(
+        {
+          barber,
+          date,
+          durationRequested,
+          closedDay: true,
+          message: 'El barbero no atiende este día',
+          workingHours: null,
+          availableSlots: [],
+        },
+        {
+          headers: {
+            'Cache-Control': `public, max-age=${CACHE_MAX_AGE}, s-maxage=${CACHE_MAX_AGE}`,
+          },
+        }
+      )
     }
 
     const { startMin, endMin } = dayWindow
@@ -102,17 +111,24 @@ export async function GET(req: NextRequest) {
       return true
     })
 
-    return NextResponse.json({
-      barber,
-      date,
-      durationRequested,
-      closedDay: false,
-      workingHours: {
-        start: minutesToHHMM(startMin),
-        end: minutesToHHMM(endMin),
+    return NextResponse.json(
+      {
+        barber,
+        date,
+        durationRequested,
+        closedDay: false,
+        workingHours: {
+          start: minutesToHHMM(startMin),
+          end: minutesToHHMM(endMin),
+        },
+        availableSlots,
       },
-      availableSlots,
-    })
+      {
+        headers: {
+          'Cache-Control': `public, max-age=${CACHE_MAX_AGE}, s-maxage=${CACHE_MAX_AGE}`,
+        },
+      }
+    )
   } catch (err) {
     console.error('availability GET:', err)
     return NextResponse.json({ error: 'Error del servidor' }, { status: 500 })

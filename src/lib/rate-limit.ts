@@ -1,27 +1,51 @@
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
 
-let ratelimit: Ratelimit | null | undefined
+let publicApiRatelimit: Ratelimit | null | undefined
+let writeApiRatelimit: Ratelimit | null | undefined
 
 /**
- * Sliding-window limiter for public API routes. Requires UPSTASH_REDIS_REST_URL and
- * UPSTASH_REDIS_REST_TOKEN; if unset, returns null (no limiting — fine for local dev).
+ * Sliding-window limiter for public API routes (read-only). 
+ * Requires UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_TOKEN.
  */
 export function getPublicApiRatelimit(): Ratelimit | null {
-  if (ratelimit !== undefined) return ratelimit
+  if (publicApiRatelimit !== undefined) return publicApiRatelimit
 
   const url = process.env.UPSTASH_REDIS_REST_URL
   const token = process.env.UPSTASH_REDIS_REST_TOKEN
   if (!url || !token) {
-    ratelimit = null
+    publicApiRatelimit = null
     return null
   }
 
   const redis = new Redis({ url, token })
-  ratelimit = new Ratelimit({
+  publicApiRatelimit = new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(120, '1 m'),
-    prefix: 'babernew:public_api',
+    prefix: 'barbernew:public_api',
   })
-  return ratelimit
+  return publicApiRatelimit
+}
+
+/**
+ * Stricter limiter for write operations (POST/PUT/DELETE).
+ * 30 requests per minute.
+ */
+export function getWriteApiRatelimit(): Ratelimit | null {
+  if (writeApiRatelimit !== undefined) return writeApiRatelimit
+
+  const url = process.env.UPSTASH_REDIS_REST_URL
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+  if (!url || !token) {
+    writeApiRatelimit = null
+    return null
+  }
+
+  const redis = new Redis({ url, token })
+  writeApiRatelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(30, '1 m'),
+    prefix: 'barbernew:write_api',
+  })
+  return writeApiRatelimit
 }

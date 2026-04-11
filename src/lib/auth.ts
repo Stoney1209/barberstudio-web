@@ -12,23 +12,23 @@ export interface AuthenticatedUser {
 export async function auth() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { userId: null }
+  if (!user || !user.email) return { userId: null }
   
   let defaultRole: UserRole = 'CLIENT'
   const adminString = (process.env.ADMIN_EMAILS || '').toLowerCase()
-  if (adminString.includes(user.email?.toLowerCase() || '')) {
+  if (adminString.includes(user.email.toLowerCase())) {
     defaultRole = 'ADMIN'
   }
 
   const dbUser = await prisma.user.upsert({
-    where: { email: user.email! },
+    where: { email: user.email },
     update: {
         role: defaultRole === 'ADMIN' ? 'ADMIN' : undefined
     },
     create: {
       id: user.id,
-      email: user.email!,
-      name: user.user_metadata?.full_name || user.email!.split('@')[0],
+      email: user.email,
+      name: user.user_metadata?.full_name || user.email.split('@')[0],
       role: defaultRole
     }
   })

@@ -11,6 +11,8 @@ const GalleryInput = z.object({
   barberId: z.string().optional(),
 })
 
+const CACHE_MAX_AGE = 60 // seconds
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -35,7 +37,14 @@ export async function GET(req: NextRequest) {
     const hasMore = rows.length > take
     const gallery = hasMore ? rows.slice(0, take) : rows
 
-    return NextResponse.json({ gallery, pagination: { page, limit, hasMore } })
+    return NextResponse.json(
+      { gallery, pagination: { page, limit, hasMore } },
+      {
+        headers: {
+          'Cache-Control': `public, max-age=${CACHE_MAX_AGE}, s-maxage=${CACHE_MAX_AGE}`,
+        },
+      }
+    )
   } catch (err) {
     console.error('gallery GET:', err)
     return NextResponse.json({ error: 'Error del servidor' }, { status: 500 })

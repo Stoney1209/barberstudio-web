@@ -10,6 +10,8 @@ const BarberInput = z.object({
   phone: z.string().optional(),
 })
 
+const CACHE_MAX_AGE = 60 // seconds
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -35,7 +37,14 @@ export async function GET(req: NextRequest) {
     const hasMore = rows.length > take
     const barbers = hasMore ? rows.slice(0, take) : rows
 
-    return NextResponse.json({ barbers, pagination: { page, limit, hasMore } })
+    return NextResponse.json(
+      { barbers, pagination: { page, limit, hasMore } },
+      {
+        headers: {
+          'Cache-Control': `public, max-age=${CACHE_MAX_AGE}, s-maxage=${CACHE_MAX_AGE}`,
+        },
+      }
+    )
   } catch (err) {
     console.error('barbers GET:', err)
     return NextResponse.json({ error: 'Error del servidor' }, { status: 500 })

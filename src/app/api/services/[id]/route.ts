@@ -68,6 +68,11 @@ export async function DELETE(req: NextRequest, ctx: { params: { id: string } }) 
 
   const { id } = ctx.params
   try {
+    const service = await prisma.service.findUnique({ where: { id } })
+    if (!service) {
+      return NextResponse.json({ error: 'Servicio no encontrado' }, { status: 404 })
+    }
+
     await prisma.service.delete({ where: { id } })
     return NextResponse.json({ ok: true })
   } catch (err) {

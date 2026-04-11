@@ -23,7 +23,6 @@ const isPublicRoute = (pathname: string) => {
   if (pathname.startsWith('/api/auth')) return true
   if (pathname.startsWith('/api/services')) return true
   if (pathname.startsWith('/api/barbers')) return true
-  if (pathname === '/api/appointments') return true // Creación es semi-pública y protegida en su handler si hace falta
   if (pathname.startsWith('/api/availability')) return true
   if (pathname.startsWith('/api/reviews')) return true
   if (pathname.startsWith('/api/galeria')) return true

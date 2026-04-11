@@ -14,11 +14,18 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (authResult instanceof NextResponse) return authResult
 
   try {
+    const barber = await prisma.user.findUnique({
+      where: { id: params.id, role: 'BARBER' },
+    })
+    if (!barber) {
+      return NextResponse.json({ error: 'Barbero no encontrado' }, { status: 404 })
+    }
+
     const body = await req.json()
     const parsed = BarberUpdateInput.parse(body)
 
-    const barber = await prisma.user.update({
-      where: { id: params.id, role: 'BARBER' },
+    const updatedBarber = await prisma.user.update({
+      where: { id: params.id },
       data: {
         name: parsed.name,
         email: parsed.email,
@@ -32,7 +39,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       },
     })
 
-    return NextResponse.json({ barber })
+    return NextResponse.json({ barber: updatedBarber })
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Datos inválidos', details: err.flatten() }, { status: 400 })
@@ -47,8 +54,15 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   if (authResult instanceof NextResponse) return authResult
 
   try {
-    await prisma.user.delete({
+    const barber = await prisma.user.findUnique({
       where: { id: params.id, role: 'BARBER' },
+    })
+    if (!barber) {
+      return NextResponse.json({ error: 'Barbero no encontrado' }, { status: 404 })
+    }
+
+    await prisma.user.delete({
+      where: { id: params.id },
     })
     return new NextResponse(null, { status: 204 })
   } catch (err) {

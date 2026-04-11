@@ -4,13 +4,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { SignOutButton } from '@/components/ui/SignOutButton'
+import { LayoutDashboard, Calendar, Scissors, Package, Users, Home, LogOut } from 'lucide-react'
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: '📊' },
-  { href: '/dashboard/citas', label: 'Citas', icon: '📅' },
-  { href: '/dashboard/barbers', label: 'Barberos', icon: '✂️' },
-  { href: '/dashboard/services', label: 'Servicios', icon: '💇' },
-  { href: '/dashboard/clients', label: 'Clientes', icon: '👥' },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard/citas', label: 'Citas', icon: Calendar },
+  { href: '/dashboard/barbers', label: 'Barberos', icon: Scissors },
+  { href: '/dashboard/services', label: 'Servicios', icon: Package },
+  { href: '/dashboard/clients', label: 'Clientes', icon: Users },
 ]
 
 export const AdminSidebar: React.FC = () => {
@@ -62,9 +63,7 @@ export const AdminSidebar: React.FC = () => {
                       : 'text-muted/60 hover:text-white'
                   }`}
                 >
-                  <span className={`text-xl transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
-                    {item.icon}
-                  </span>
+                  <item.icon size={20} className={`transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
                   <span className={`text-sm tracking-wide font-medium transition-all ${isActive ? 'translate-x-1' : ''}`}>
                     {item.label}
                   </span>
@@ -85,7 +84,7 @@ export const AdminSidebar: React.FC = () => {
                href="/" 
                className="flex items-center gap-4 px-5 py-3 text-muted/40 hover:text-gold transition-all text-sm group"
              >
-               <span className="group-hover:-translate-x-1 transition-transform">🏠</span>
+               <Home size={16} className="group-hover:-translate-x-1 transition-transform" />
                <span className="font-light tracking-widest uppercase text-[10px]">Página de Inicio</span>
              </Link>
           </div>

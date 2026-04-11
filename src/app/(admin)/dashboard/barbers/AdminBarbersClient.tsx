@@ -4,7 +4,6 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Edit2, Trash2, Mail, Phone, Calendar, Clock, Scissors } from 'lucide-react'
-import { BarberAvailabilityModal } from './BarberAvailabilityModal'
 import { useToast } from '@/components/ui/ToastContext'
 
 type Barber = {
@@ -19,7 +18,6 @@ export default function AdminBarbersClient({ initialBarbers }: { initialBarbers:
   const [barbers, setBarbers] = useState(initialBarbers)
   const [showModal, setShowModal] = useState(false)
   const [editingBarber, setEditingBarber] = useState<Barber | null>(null)
-  const [availabilityBarber, setAvailabilityBarber] = useState<{id: string, name: string} | null>(null)
   
   const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
@@ -285,18 +283,7 @@ export default function AdminBarbersClient({ initialBarbers }: { initialBarbers:
                 </form>
               </motion.div>
             </div>
-          )}
-
-          {availabilityBarber && (
-            <BarberAvailabilityModal 
-               barberId={availabilityBarber.id}
-               barberName={availabilityBarber.name}
-               onClose={() => setAvailabilityBarber(null)}
-            />
 )}
-          </motion.div>
-            </div>
-          )}
         </AnimatePresence>
       </div>
     </div>

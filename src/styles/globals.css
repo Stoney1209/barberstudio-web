@@ -354,6 +354,17 @@ body {
   color: var(--primary);
 }
 
+/* Select overrides for better visibility */
+select {
+  color-scheme: light;
+}
+
+select option {
+  background: var(--surface-2);
+  color: var(--smoke);
+  padding: 8px;
+}
+
 /* Focus states */
 :focus-visible {
   outline: 2px solid var(--gold);

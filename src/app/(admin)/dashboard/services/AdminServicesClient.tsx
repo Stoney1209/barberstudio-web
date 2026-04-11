@@ -244,14 +244,14 @@ export default function AdminServicesClient({ initialServices }: { initialServic
                       </div>
                       <div className="space-y-2">
                          <label className="text-[10px] text-gold/40 uppercase tracking-widest font-bold">Categoría</label>
-                         <select 
-                            value={formData.category}
-                            onChange={e => setFormData({...formData, category: e.target.value})}
-                            className="w-full bg-black/40 border border-gold/10 p-4 text-xs tracking-widest text-muted outline-none">
-                            <option>FADE</option>
-                            <option>CLASSIC</option>
-                            <option>BEARD</option>
-                         </select>
+<select 
+                             value={formData.category}
+                             onChange={e => setFormData({...formData, category: e.target.value})}
+                             className="w-full bg-black/40 border border-gold/10 p-4 text-xs tracking-widest text-white outline-none">
+                             <option value="FADE">FADE</option>
+                             <option value="CLASSIC">CLASSIC</option>
+                             <option value="BEARD">BEARD</option>
+                          </select>
                       </div>
                        <div className="pt-8 flex gap-4">
                           <motion.button 

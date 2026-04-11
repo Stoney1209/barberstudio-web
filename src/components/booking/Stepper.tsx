@@ -194,8 +194,8 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <div className="flex items-center justify-between mb-12 relative">
-        <div className="absolute top-4 left-0 right-0 h-px bg-gold/10" />
+      <div className="flex items-center justify-between mb-12 relative lg:relative sticky lg:top-0 z-50 bg-surface-2/95 backdrop-blur-lg py-4 lg:py-0 rounded-lg lg:rounded-none -mx-4 px-4 lg:mx-0 lg:px-0">
+        <div className="absolute top-4 left-0 right-0 h-px bg-gold/10 hidden lg:block" />
         <div className="absolute top-4 left-0 h-px bg-gold transition-all duration-500" style={{ width: `${(step / 3) * 100}%` }} />
         
         {STEPS.map((label, index) => {
@@ -262,6 +262,13 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
               <div>
                 <h3 className="text-2xl font-display text-white mb-2">Elige a tu barbero</h3>
                 <p className="text-muted/60 mb-8">Profesionales listos para atenderte</p>
+                
+                {barbers.length === 0 ? (
+                  <div className="p-8 text-center border border-gold/10 rounded-xl">
+                    <p className="text-muted/60 mb-4">No hay barberos disponibles en este momento.</p>
+                    <p className="text-sm text-muted/40">Vuelve más tarde o contacta directamente a la barbería.</p>
+                  </div>
+                ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {barbers.map((b) => (
                     <motion.button 
@@ -286,6 +293,7 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
                     </motion.button>
                   ))}
                 </div>
+                )}
               </div>
             )}
 

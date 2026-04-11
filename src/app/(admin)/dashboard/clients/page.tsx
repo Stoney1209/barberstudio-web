@@ -1,10 +1,26 @@
 import { prisma } from '@/lib/prisma'
+import { Search } from 'lucide-react'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
-export default async function ClientsAdminPage() {
+export default async function ClientsAdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
+  const { q } = await searchParams
+  
   const clients = await prisma.user.findMany({
-    where: { role: 'CLIENT' },
+    where: { 
+      role: 'CLIENT',
+      ...(q && {
+        OR: [
+          { name: { contains: q, mode: 'insensitive' } },
+          { email: { contains: q, mode: 'insensitive' } },
+        ],
+      }),
+    },
     orderBy: { createdAt: 'desc' },
   })
 
@@ -17,6 +33,16 @@ export default async function ClientsAdminPage() {
             <h1 className="text-4xl font-display font-light text-white">Clientes</h1>
           </div>
         </div>
+
+        <form className="mb-6 relative">
+          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted/40" />
+          <input
+            name="q"
+            defaultValue={q || ''}
+            placeholder="Buscar por nombre o email..."
+            className="w-full bg-surface-2/50 border border-gold/10 pl-12 pr-4 py-3 text-white placeholder-muted/40 outline-none focus:border-gold/30 transition-all"
+          />
+        </form>
 
         <div className="glass border border-gold/10 rounded-lg overflow-hidden shadow-glow-sm">
           <div className="overflow-x-auto">
@@ -47,7 +73,14 @@ export default async function ClientsAdminPage() {
           {clients.length === 0 && (
             <div className="p-20 text-center">
               <span className="text-4xl block mb-4">👥</span>
-              <p className="text-muted/60">No hay clientes registrados todavía</p>
+              <p className="text-muted/60">
+                {q ? `No se encontraron resultados para "${q}"` : 'No hay clientes registrados todavía'}
+              </p>
+              {q && (
+                <Link href="/dashboard/clients" className="text-gold hover:underline text-sm mt-2 inline-block">
+                  Limpiar búsqueda
+                </Link>
+              )}
             </div>
           )}
         </div>

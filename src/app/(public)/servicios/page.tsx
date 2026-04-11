@@ -129,6 +129,13 @@ export default function ServicesPage() {
           </div>
         )}
 
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-surface-2/95 backdrop-blur-lg border-t border-gold/10 z-50 flex justify-center">
+            <Link href="/reservar" className="flex-1 py-4 bg-gold text-primary text-center font-bold uppercase tracking-wider rounded-lg shadow-glow">
+              Reservar Cita
+            </Link>
+          </div>
+          <div className="lg:hidden h-24"></div>
+
         <div className="mt-16 text-center">
           <div className="glass p-8 border border-gold/10 rounded-lg inline-block">
             <p className="text-white font-display text-xl mb-2">

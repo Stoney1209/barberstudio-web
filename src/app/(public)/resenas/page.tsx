@@ -13,9 +13,12 @@ type Review = {
   }
 }
 
+const ITEMS_PER_PAGE = 10
+
 export default function ResenasPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
 
   useEffect(() => {
     async function fetchReviews() {
@@ -31,6 +34,11 @@ export default function ResenasPage() {
     }
     fetchReviews()
   }, [])
+
+  const visibleReviews = reviews.slice(0, visibleCount)
+  const hasMore = visibleCount < reviews.length
+
+  const loadMore = () => setVisibleCount(c => c + ITEMS_PER_PAGE)
 
   const stats = {
     average: reviews.length > 0 
@@ -137,6 +145,15 @@ export default function ResenasPage() {
                     </div>
                   </div>
                 ))}
+
+                {hasMore && (
+                  <button
+                    onClick={loadMore}
+                    className="w-full py-4 border border-gold/20 text-muted hover:text-gold hover:border-gold/40 transition-all text-sm uppercase tracking-wider mt-4"
+                  >
+                    Cargar más reseñas ({reviews.length - visibleCount} restantes)
+                  </button>
+                )}
               </div>
             ) : (
               <div className="text-center py-16 glass border border-gold/10 rounded-lg">

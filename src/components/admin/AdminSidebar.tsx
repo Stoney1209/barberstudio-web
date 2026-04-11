@@ -4,12 +4,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { SignOutButton } from '@/components/ui/SignOutButton'
-import { LayoutDashboard, Calendar, Scissors, Package, Users, Home, LogOut } from 'lucide-react'
+import { LayoutDashboard, Calendar, Scissors, Package, Users, Home, LogOut, Clock } from 'lucide-react'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/dashboard/citas', label: 'Citas', icon: Calendar },
   { href: '/dashboard/barbers', label: 'Barberos', icon: Scissors },
+  { href: '/dashboard/availability', label: 'Horarios', icon: Clock },
   { href: '/dashboard/services', label: 'Servicios', icon: Package },
   { href: '/dashboard/clients', label: 'Clientes', icon: Users },
 ]

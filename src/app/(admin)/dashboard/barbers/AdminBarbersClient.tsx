@@ -237,8 +237,9 @@ export default function AdminBarbersClient({ initialBarbers }: { initialBarbers:
 
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="space-y-2">
-                    <label className="block text-[10px] text-gold/60 uppercase tracking-widest font-bold">Nombre Completo</label>
+                    <label htmlFor="barber-name" className="block text-[10px] text-gold/60 uppercase tracking-widest font-bold">Nombre Completo</label>
                     <input
+                      id="barber-name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -250,8 +251,9 @@ export default function AdminBarbersClient({ initialBarbers }: { initialBarbers:
                   
                   <div className="grid md:grid-cols-2 gap-8">
                     <div className="space-y-2">
-                      <label className="block text-[10px] text-gold/60 uppercase tracking-widest font-bold">Correo</label>
+                      <label htmlFor="barber-email" className="block text-[10px] text-gold/60 uppercase tracking-widest font-bold">Correo</label>
                       <input
+                        id="barber-email"
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -260,8 +262,9 @@ export default function AdminBarbersClient({ initialBarbers }: { initialBarbers:
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="block text-[10px] text-gold/60 uppercase tracking-widest font-bold">Teléfono</label>
+                      <label htmlFor="barber-phone" className="block text-[10px] text-gold/60 uppercase tracking-widest font-bold">Teléfono</label>
                       <input
+                        id="barber-phone"
                         type="text"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}

@@ -1,4 +1,5 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireRole } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { GET, POST } from '../route'
 
@@ -29,7 +30,9 @@ describe('GET /api/services', () => {
 
 describe('POST /api/services', () => {
   it('returns 403 for non-admin', async () => {
-    p.user.findUnique.mockResolvedValue({ id: 'test-user-id', role: 'BARBER' })
+    ;(requireRole as jest.Mock).mockResolvedValueOnce(
+      NextResponse.json({ error: 'Prohibido' }, { status: 403 })
+    )
 
     const req = new NextRequest('http://localhost/api/services', {
       method: 'POST',
@@ -47,7 +50,7 @@ describe('POST /api/services', () => {
   })
 
   it('creates service for ADMIN', async () => {
-    p.user.findUnique.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' })
+    ;(requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin-1', role: 'ADMIN' })
     const created = {
       id: 'svc-new',
       name: 'Beard',
@@ -79,7 +82,7 @@ describe('POST /api/services', () => {
   })
 
   it('returns 400 on invalid payload', async () => {
-    p.user.findUnique.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' })
+    ;(requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin-1', role: 'ADMIN' })
 
     const req = new NextRequest('http://localhost/api/services', {
       method: 'POST',

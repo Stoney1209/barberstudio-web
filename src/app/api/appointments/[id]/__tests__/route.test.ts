@@ -1,5 +1,5 @@
-import { NextRequest } from 'next/server'
-import { auth } from '@/lib/auth'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { GET, PUT, DELETE } from '../route'
 
@@ -23,8 +23,14 @@ const baseAppointment = {
 }
 
 describe('GET /api/appointments/[id]', () => {
+  beforeEach(() => {
+    ;(requireAuth as jest.Mock).mockResolvedValue({ userId: 'test-user-id' })
+  })
+
   it('returns 401 when unauthenticated', async () => {
-    ;(auth as unknown as jest.Mock).mockResolvedValueOnce({ userId: null })
+    ;(requireAuth as jest.Mock).mockResolvedValueOnce(
+      NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    )
     const req = new NextRequest('http://localhost/api/appointments/apt-1')
     const res = await GET(req, { params: { id: 'apt-1' } })
     expect(res.status).toBe(401)

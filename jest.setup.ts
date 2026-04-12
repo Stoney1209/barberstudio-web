@@ -12,6 +12,16 @@ if (!global.fetch) {
   ;(global as unknown as { Headers: typeof Headers }).Headers = undici.Headers
 }
 
+const MockCookies = {
+  get: jest.fn(),
+  set: jest.fn(),
+  delete: jest.fn(),
+}
+
+jest.mock('next/headers', () => ({
+  cookies: jest.fn(() => MockCookies),
+}))
+
 const appointmentMock = {
   findMany: jest.fn(),
   findFirst: jest.fn(),
@@ -38,6 +48,7 @@ const userMock = {
   update: jest.fn(),
   delete: jest.fn(),
   count: jest.fn(),
+  upsert: jest.fn(),
 }
 
 const availabilityMock = {
@@ -85,25 +96,28 @@ jest.mock('@/lib/prisma', () => ({
   },
 }))
 
+jest.mock('@/lib/auth', () => ({
+  auth: jest.fn(),
+  requireAuth: jest.fn(),
+  requireRole: jest.fn(),
+  getSessionUser: jest.fn(),
+}))
+
 jest.mock('@supabase/ssr', () => ({
   createServerClient: jest.fn(() => ({
-      auth: {
-        getUser: jest.fn().mockResolvedValue({
-          data: { user: { id: 'test-user-id', email: 'test@example.com' } },
-          error: null,
-        }),
-      },
-      cookies: {
-        get: jest.fn(),
-        set: jest.fn(),
-        remove: jest.fn(),
-      },
-    })),
+    auth: {
+      getUser: jest.fn().mockResolvedValue({
+        data: { user: { id: 'test-user-id', email: 'test@example.com' } },
+        error: null,
+      }),
+    },
+    cookies: MockCookies,
+  })),
   createBrowserClient: jest.fn(() => ({
-      auth: {
-        getSession: jest.fn().mockResolvedValue({ data: { session: { user: { id: 'test-user-id' } } }, error: null }),
-        onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
-        signOut: jest.fn().mockResolvedValue({ error: null }),
-      },
-    })),
+    auth: {
+      getSession: jest.fn().mockResolvedValue({ data: { session: { user: { id: 'test-user-id' } } }, error: null }),
+      onAuthStateChange: jest.fn(() => ({ data: { subscription: { unsubscribe: jest.fn() } } })),
+      signOut: jest.fn().mockResolvedValue({ error: null }),
+    },
+  })),
 }))

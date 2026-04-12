@@ -1,4 +1,5 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireRole } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { GET, POST } from '../route'
 
@@ -47,7 +48,9 @@ describe('GET /api/barbers', () => {
 
 describe('POST /api/barbers', () => {
   it('returns 403 for non-admin', async () => {
-    p.user.findUnique.mockResolvedValue({ id: 'x', role: 'CLIENT' })
+    ;(requireRole as jest.Mock).mockResolvedValueOnce(
+      NextResponse.json({ error: 'Prohibido' }, { status: 403 })
+    )
 
     const req = new NextRequest('http://localhost/api/barbers', {
       method: 'POST',
@@ -60,7 +63,7 @@ describe('POST /api/barbers', () => {
   })
 
   it('creates barber as ADMIN', async () => {
-    p.user.findUnique.mockResolvedValue({ id: 'admin', role: 'ADMIN' })
+    ;(requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin', role: 'ADMIN' })
     p.user.create.mockResolvedValue({ id: 'new-b', name: 'New', email: 'new@x.com' })
 
     const req = new NextRequest('http://localhost/api/barbers', {

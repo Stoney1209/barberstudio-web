@@ -22,6 +22,7 @@ export default function ResenasPage() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
 
   useEffect(() => {
     async function checkUser() {
@@ -86,6 +87,10 @@ export default function ResenasPage() {
             La satisfacción de nuestros clientes es nuestra mejor recomendación.
           </p>
         </div>
+
+        {user && (
+          <ReviewForm key={refreshKey} onReviewAdded={() => setRefreshKey(k => k + 1)} />
+        )}
 
         {loading ? (
           <div className="flex justify-center py-20">

@@ -1,5 +1,5 @@
-import { NextRequest } from 'next/server'
-import { auth } from '@/lib/auth'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireRole } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { GET, POST } from '../route'
 
@@ -72,7 +72,9 @@ describe('GET /api/availability', () => {
 
 describe('POST /api/availability', () => {
   it('returns 401 when not authenticated', async () => {
-    ;(auth as unknown as jest.Mock).mockResolvedValueOnce({ userId: null })
+    ;(requireRole as jest.Mock).mockResolvedValueOnce(
+      NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    )
 
     const req = new NextRequest('http://localhost/api/availability', {
       method: 'POST',
@@ -90,7 +92,9 @@ describe('POST /api/availability', () => {
   })
 
   it('returns 403 when user is CLIENT', async () => {
-    p.user.findUnique.mockResolvedValue({ id: 'test-user-id', role: 'CLIENT' })
+    ;(requireRole as jest.Mock).mockResolvedValueOnce(
+      NextResponse.json({ error: 'Prohibido' }, { status: 403 })
+    )
 
     const req = new NextRequest('http://localhost/api/availability', {
       method: 'POST',
@@ -108,7 +112,7 @@ describe('POST /api/availability', () => {
   })
 
   it('upserts availability for BARBER', async () => {
-    p.user.findUnique.mockResolvedValue({ id: 'test-user-id', role: 'BARBER' })
+    ;(requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id', role: 'BARBER' })
     const saved = {
       id: 'av1',
       barberId: 'b1',

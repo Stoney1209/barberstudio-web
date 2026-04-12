@@ -1,4 +1,5 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireRole } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { GET } from '../route'
 
@@ -15,7 +16,9 @@ const p = prisma as unknown as {
 
 describe('GET /api/admin/stats', () => {
   it('returns 403 for non-admin', async () => {
-    p.user.findUnique.mockResolvedValue({ id: 'test-user-id', role: 'BARBER' })
+    ;(requireRole as jest.Mock).mockResolvedValueOnce(
+      NextResponse.json({ error: 'Prohibido' }, { status: 403 })
+    )
 
     const req = new NextRequest('http://localhost/api/admin/stats')
     const res = await GET(req)
@@ -23,7 +26,7 @@ describe('GET /api/admin/stats', () => {
   })
 
   it('returns aggregated stats for ADMIN', async () => {
-    p.user.findUnique.mockResolvedValue({ id: 'admin-1', role: 'ADMIN' })
+    ;(requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin-1', role: 'ADMIN' })
 
     p.appointment.count.mockResolvedValueOnce(100).mockResolvedValueOnce(5).mockResolvedValueOnce(20)
     p.appointment.groupBy.mockResolvedValueOnce([
@@ -53,14 +56,14 @@ describe('GET /api/admin/stats', () => {
 
     const req = new NextRequest('http://localhost/api/admin/stats')
     const res = await GET(req)
-    const body = await res.json()
+    const resBody = await res.json()
 
     expect(res.status).toBe(200)
-    expect(body.appointments.total).toBe(100)
-    expect(body.users.clients).toBe(30)
-    expect(body.revenue.total).toBe(30)
-    expect(body.revenue.thisWeek).toBe(15)
-    expect(body.topServices[0].serviceName).toBe('Fade')
-    expect(body.recentAppointments[0].client).toBe('C')
+    expect(resBody.appointments.total).toBe(100)
+    expect(resBody.users.clients).toBe(30)
+    expect(resBody.revenue.total).toBe(30)
+    expect(resBody.revenue.thisWeek).toBe(15)
+    expect(resBody.topServices[0].serviceName).toBe('Fade')
+    expect(resBody.recentAppointments[0].client).toBe('C')
   })
 })

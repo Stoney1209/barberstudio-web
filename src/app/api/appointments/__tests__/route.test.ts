@@ -1,5 +1,5 @@
-import { NextRequest } from 'next/server'
-import { auth } from '@/lib/auth'
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { GET, POST } from '../route'
 
@@ -21,6 +21,7 @@ describe('POST /api/appointments', () => {
   beforeEach(() => {
     p.availability.findFirst.mockResolvedValue(null)
     p.availability.count.mockResolvedValue(0)
+    ;(requireAuth as jest.Mock).mockResolvedValue({ userId: 'test-user-id' })
   })
 
   it('creates an appointment when data is valid and no conflict', async () => {
@@ -84,7 +85,9 @@ describe('POST /api/appointments', () => {
   })
 
   it('returns 401 when not authenticated', async () => {
-    ;(auth as unknown as jest.Mock).mockResolvedValueOnce({ userId: null })
+    ;(requireAuth as jest.Mock).mockResolvedValueOnce(
+      NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    )
 
     const req = new NextRequest('http://localhost/api/appointments', {
       method: 'POST',
@@ -293,8 +296,14 @@ describe('POST /api/appointments', () => {
 })
 
 describe('GET /api/appointments', () => {
+  beforeEach(() => {
+    ;(requireAuth as jest.Mock).mockResolvedValue({ userId: 'test-user-id' })
+  })
+
   it('returns 401 when not authenticated', async () => {
-    ;(auth as unknown as jest.Mock).mockResolvedValueOnce({ userId: null })
+    ;(requireAuth as jest.Mock).mockResolvedValueOnce(
+      NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+    )
     const req = new NextRequest('http://localhost/api/appointments')
     const res = await GET(req)
     expect(res.status).toBe(401)

@@ -4,11 +4,12 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mail, Lock, ArrowRight, Scissors } from 'lucide-react'
+import { Mail, Lock, ArrowRight, Scissors, User } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [view, setView] = useState<'login' | 'register'>('login')
@@ -26,6 +27,11 @@ export default function LoginPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              full_name: name,
+            }
+          }
         })
         if (error) throw error
         setError('Revisa tu correo para confirmar tu registro.')
@@ -95,6 +101,29 @@ export default function LoginPage() {
 
         <div className="glass border border-gold/10 p-8">
           <form className="space-y-5" onSubmit={handleAuth}>
+            <AnimatePresence mode="wait">
+              {view === 'register' && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                >
+                  <label className="block text-xs text-muted/60 uppercase tracking-widest mb-2">Nombre completo</label>
+                  <div className="relative">
+                    <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted/40" />
+                    <input
+                      type="text"
+                      required={view === 'register'}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full bg-black/40 border border-gold/10 p-4 pl-12 text-white placeholder-muted/40 outline-none focus:border-gold/40 transition-all"
+                      placeholder="Tu nombre"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div>
               <label className="block text-xs text-muted/60 uppercase tracking-widest mb-2">Correo</label>
               <div className="relative">

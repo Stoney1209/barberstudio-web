@@ -72,7 +72,7 @@ describe('GET /api/availability', () => {
 
 describe('POST /api/availability', () => {
   it('returns 401 when not authenticated', async () => {
-    ;(requireRole as jest.Mock).mockResolvedValueOnce(
+    (requireRole as jest.Mock).mockResolvedValueOnce(
       NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     )
 
@@ -92,7 +92,7 @@ describe('POST /api/availability', () => {
   })
 
   it('returns 403 when user is CLIENT', async () => {
-    ;(requireRole as jest.Mock).mockResolvedValueOnce(
+    (requireRole as jest.Mock).mockResolvedValueOnce(
       NextResponse.json({ error: 'Prohibido' }, { status: 403 })
     )
 
@@ -112,7 +112,7 @@ describe('POST /api/availability', () => {
   })
 
   it('upserts availability for BARBER', async () => {
-    ;(requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id', role: 'BARBER' })
+    (requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id', role: 'BARBER' })
     const saved = {
       id: 'av1',
       barberId: 'b1',

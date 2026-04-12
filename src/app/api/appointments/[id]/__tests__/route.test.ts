@@ -24,11 +24,11 @@ const baseAppointment = {
 
 describe('GET /api/appointments/[id]', () => {
   beforeEach(() => {
-    ;(requireAuth as jest.Mock).mockResolvedValue({ userId: 'test-user-id' })
+    (requireAuth as jest.Mock).mockResolvedValue({ userId: 'test-user-id' })
   })
 
   it('returns 401 when unauthenticated', async () => {
-    ;(requireAuth as jest.Mock).mockResolvedValueOnce(
+    (requireAuth as jest.Mock).mockResolvedValueOnce(
       NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     )
     const req = new NextRequest('http://localhost/api/appointments/apt-1')

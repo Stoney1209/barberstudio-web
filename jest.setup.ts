@@ -1,15 +1,16 @@
 import '@testing-library/jest-dom'
 import { TextEncoder, TextDecoder } from 'util'
+import { fetch, Request, Response, Headers, Agent } from 'undici'
 
 global.TextEncoder = TextEncoder
 ;(global as unknown as { TextDecoder: typeof TextDecoder }).TextDecoder = TextDecoder
 
 if (!global.fetch) {
-  const undici = require('undici')
-  ;(global as unknown as { fetch: typeof fetch }).fetch = undici.fetch
-  ;(global as unknown as { Request: typeof Request }).Request = undici.Request
-  ;(global as unknown as { Response: typeof Response }).Response = undici.Response
-  ;(global as unknown as { Headers: typeof Headers }).Headers = undici.Headers
+  (global as unknown as { fetch: typeof fetch }).fetch = fetch
+  ;(global as unknown as { Request: typeof Request }).Request = Request
+  ;(global as unknown as { Response: typeof Response }).Response = Response
+  ;(global as unknown as { Headers: typeof Headers }).Headers = Headers
+  ;(global as unknown as { Agent: typeof Agent }).Agent = Agent
 }
 
 const MockCookies = {

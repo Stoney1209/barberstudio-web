@@ -30,7 +30,7 @@ describe('GET /api/services', () => {
 
 describe('POST /api/services', () => {
   it('returns 403 for non-admin', async () => {
-    ;(requireRole as jest.Mock).mockResolvedValueOnce(
+    (requireRole as jest.Mock).mockResolvedValueOnce(
       NextResponse.json({ error: 'Prohibido' }, { status: 403 })
     )
 
@@ -50,7 +50,7 @@ describe('POST /api/services', () => {
   })
 
   it('creates service for ADMIN', async () => {
-    ;(requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin-1', role: 'ADMIN' })
+    (requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin-1', role: 'ADMIN' })
     const created = {
       id: 'svc-new',
       name: 'Beard',
@@ -82,7 +82,7 @@ describe('POST /api/services', () => {
   })
 
   it('returns 400 on invalid payload', async () => {
-    ;(requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin-1', role: 'ADMIN' })
+    (requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin-1', role: 'ADMIN' })
 
     const req = new NextRequest('http://localhost/api/services', {
       method: 'POST',

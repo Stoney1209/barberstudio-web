@@ -48,7 +48,7 @@ describe('GET /api/barbers', () => {
 
 describe('POST /api/barbers', () => {
   it('returns 403 for non-admin', async () => {
-    ;(requireRole as jest.Mock).mockResolvedValueOnce(
+    (requireRole as jest.Mock).mockResolvedValueOnce(
       NextResponse.json({ error: 'Prohibido' }, { status: 403 })
     )
 
@@ -63,7 +63,7 @@ describe('POST /api/barbers', () => {
   })
 
   it('creates barber as ADMIN', async () => {
-    ;(requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin', role: 'ADMIN' })
+    (requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin', role: 'ADMIN' })
     p.user.create.mockResolvedValue({ id: 'new-b', name: 'New', email: 'new@x.com' })
 
     const req = new NextRequest('http://localhost/api/barbers', {

@@ -54,7 +54,7 @@ describe('GET /api/reviews', () => {
 
 describe('POST /api/reviews', () => {
   it('returns 401 when unauthenticated', async () => {
-    ;(requireAuth as jest.Mock).mockResolvedValueOnce(
+    (requireAuth as jest.Mock).mockResolvedValueOnce(
       NextResponse.json({ error: 'No autorizado' }, { status: 401 })
     )
 
@@ -69,7 +69,7 @@ describe('POST /api/reviews', () => {
   })
 
   it('returns 404 when appointment missing', async () => {
-    ;(requireAuth as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id' })
+    (requireAuth as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id' })
     p.appointment.findUnique.mockResolvedValue(null)
 
     const req = new NextRequest('http://localhost/api/reviews', {
@@ -83,7 +83,7 @@ describe('POST /api/reviews', () => {
   })
 
   it('returns 403 when caller is not the client', async () => {
-    ;(requireAuth as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id' })
+    (requireAuth as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id' })
     p.appointment.findUnique.mockResolvedValue({
       id: 'a1',
       clientId: 'other',
@@ -102,7 +102,7 @@ describe('POST /api/reviews', () => {
   })
 
   it('returns 400 when appointment not completed', async () => {
-    ;(requireAuth as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id' })
+    (requireAuth as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id' })
     p.appointment.findUnique.mockResolvedValue({
       id: 'a1',
       clientId: 'test-user-id',
@@ -121,7 +121,7 @@ describe('POST /api/reviews', () => {
   })
 
   it('returns 409 when review already exists', async () => {
-    ;(requireAuth as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id' })
+    (requireAuth as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id' })
     p.appointment.findUnique.mockResolvedValue({
       id: 'a1',
       clientId: 'test-user-id',
@@ -140,7 +140,7 @@ describe('POST /api/reviews', () => {
   })
 
   it('creates review for completed appointment', async () => {
-    ;(requireAuth as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id' })
+    (requireAuth as jest.Mock).mockResolvedValueOnce({ userId: 'test-user-id' })
     p.appointment.findUnique.mockResolvedValue({
       id: 'a1',
       clientId: 'test-user-id',

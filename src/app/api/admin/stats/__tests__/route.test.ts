@@ -16,7 +16,7 @@ const p = prisma as unknown as {
 
 describe('GET /api/admin/stats', () => {
   it('returns 403 for non-admin', async () => {
-    ;(requireRole as jest.Mock).mockResolvedValueOnce(
+    (requireRole as jest.Mock).mockResolvedValueOnce(
       NextResponse.json({ error: 'Prohibido' }, { status: 403 })
     )
 
@@ -26,7 +26,7 @@ describe('GET /api/admin/stats', () => {
   })
 
   it('returns aggregated stats for ADMIN', async () => {
-    ;(requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin-1', role: 'ADMIN' })
+    (requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin-1', role: 'ADMIN' })
 
     p.appointment.count.mockResolvedValueOnce(100).mockResolvedValueOnce(5).mockResolvedValueOnce(20)
     p.appointment.groupBy.mockResolvedValueOnce([

@@ -140,6 +140,8 @@ export async function GET(req: NextRequest) {
     const barberId = searchParams.get('barberId')
     const clientId = searchParams.get('clientId')
     const date = searchParams.get('date')
+    const status = searchParams.get('status')
+    const forReview = searchParams.get('forReview')
 
     const where: any = {}
 
@@ -153,6 +155,13 @@ export async function GET(req: NextRequest) {
     }
 
     if (date) where.date = new Date(date + 'T00:00:00')
+
+    if (status) where.status = status
+
+    if (forReview === 'true' && dbUser?.role === 'CLIENT') {
+      where.status = 'COMPLETED'
+      where.review = null
+    }
 
     const { skip, take, page, limit } = parseOffsetPagination(searchParams, { defaultLimit: 100, maxLimit: 500 })
 

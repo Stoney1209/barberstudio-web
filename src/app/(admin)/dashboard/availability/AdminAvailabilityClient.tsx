@@ -76,24 +76,24 @@ function TimeSelect({ label, value, onChange, disabled, color = 'white' }: TimeS
   }, [])
 
   return (
-    <div className="flex flex-col gap-2" ref={ref}>
-      <label className="text-xs text-muted/50 uppercase tracking-widest">{label}</label>
+    <div className="flex flex-col gap-3" ref={ref}>
+      <label className="text-sm text-muted/50 uppercase tracking-widest font-medium">{label}</label>
       <div className="relative">
         <button
           type="button"
           onClick={() => !disabled && setOpen(!open)}
           disabled={disabled}
           className={`
-            w-full flex items-center justify-between gap-2 px-4 py-3 
-            bg-black/40 border border-gold/10 text-lg font-display
-            ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-gold/30'}
-            ${open ? 'border-gold/30' : ''}
-            transition-all
+            w-full flex items-center justify-between gap-3 px-6 py-4 
+            bg-black/40 border border-gold/20 text-xl font-display
+            ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-gold/40'}
+            ${open ? 'border-gold/40' : ''}
+            transition-all rounded-lg
             ${color === 'gold' ? 'text-gold' : 'text-white'}
           `}
         >
           <span>{value}</span>
-          <ChevronDown size={16} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown size={20} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>
 
         <AnimatePresence>
@@ -102,25 +102,25 @@ function TimeSelect({ label, value, onChange, disabled, color = 'white' }: TimeS
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="absolute z-50 w-full mt-1 bg-surface-2 border border-gold/20 rounded-lg shadow-xl overflow-hidden"
+              className="absolute z-50 w-full mt-2 bg-surface-2 border border-gold/30 rounded-lg shadow-xl overflow-hidden"
             >
-              <div className="p-2 border-b border-gold/10">
+              <div className="p-3 border-b border-gold/10">
                 <input
                   type="text"
                   placeholder="Buscar..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-black/40 px-2 py-1 text-xs text-white placeholder-muted/40 outline-none"
+                  className="w-full bg-black/40 px-3 py-2 text-sm text-white placeholder-muted/40 outline-none rounded"
                 />
               </div>
-              <div className="max-h-40 overflow-y-auto py-1">
+              <div className="max-h-60 overflow-y-auto py-2">
                 {filteredSlots.map(t => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => { onChange(t); setOpen(false); setSearch('') }}
                     className={`
-                      w-full px-3 py-2 text-sm text-left hover:bg-gold/10
+                      w-full px-4 py-3 text-base text-left hover:bg-gold/10
                       ${value === t ? 'text-gold bg-gold/5' : 'text-white/80'}
                     `}
                   >
@@ -230,26 +230,26 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass border border-gold/30 px-6 py-3"
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 glass border border-gold/40 px-8 py-4"
           >
-            <p className="text-gold text-xs uppercase tracking-widest">{toast}</p>
+            <p className="text-gold text-base uppercase tracking-widest font-medium">{toast}</p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="max-w-4xl mx-auto">
-        <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gold/5 pb-4">
+      <div className="max-w-6xl mx-auto">
+        <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gold/5 pb-6">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <p className="text-gold/60 text-xs uppercase tracking-[0.4em] mb-2">Panel</p>
-            <h1 className="text-3xl md:text-4xl font-display text-white italic">Horarios</h1>
+            <p className="text-gold/60 text-xs uppercase tracking-[0.4em] mb-3">Panel</p>
+            <h1 className="text-4xl md:text-5xl font-display text-white italic">Horarios</h1>
           </motion.div>
 
-          <div className="relative group min-w-[180px]">
-            <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold/40" />
+          <div className="relative group min-w-[220px]">
+            <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gold/40" />
             <select
               value={selectedBarberId}
               onChange={(e) => setSelectedBarberId(e.target.value)}
-              className="w-full bg-surface-2/40 border border-gold/10 p-2.5 pl-9 text-xs tracking-widest text-white outline-none focus:border-gold/50 appearance-none transition-all font-bold"
+              className="w-full bg-surface-2/40 border border-gold/10 p-3 pl-11 text-sm tracking-widest text-white outline-none focus:border-gold/50 appearance-none transition-all font-bold rounded-md"
             >
               {initialBarbers.map(b => (
                 <option key={b.id} value={b.id} className="bg-surface-2">{b.name || b.email}</option>
@@ -258,7 +258,7 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
           </div>
         </header>
 
-        <div className="grid grid-cols-7 gap-1 mb-6">
+        <div className="grid grid-cols-7 gap-2 mb-8">
           {DAYS.map((day, idx) => {
             const avail = availabilities[idx]
             const isActive = avail?.isActive
@@ -268,19 +268,19 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
                 key={day.key}
                 onClick={() => setActiveDay(idx)}
                 className={`
-                  relative p-3 border transition-all duration-300 flex flex-col items-center gap-1
+                  relative p-4 border transition-all duration-300 flex flex-col items-center gap-2 rounded-lg
                   ${activeDay === idx 
-                    ? 'border-gold bg-gold/5 text-gold' 
+                    ? 'border-gold bg-gold/10 text-gold' 
                     : isActive 
-                      ? 'border-gold/20 bg-gold/5/30 text-white/80 hover:border-gold/40'
+                      ? 'border-gold/30 bg-gold/5/30 text-white/80 hover:border-gold/50'
                       : 'border-gold/5 text-muted/40 hover:border-gold/20'
                   }
                 `}
               >
-                <Icon size={16} />
-                <span className="text-sm uppercase tracking-wider">{day.short}</span>
+                <Icon size={20} />
+                <span className="text-sm uppercase tracking-wider font-medium">{day.short}</span>
                 {isActive && (
-                  <div className="absolute top-2 right-2 w-2 h-2 bg-gold rounded-full shadow-glow" />
+                  <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-gold rounded-full shadow-glow" />
                 )}
               </button>
             )
@@ -292,24 +292,24 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
             <div className="w-8 h-8 border-2 border-gold/10 border-t-gold rounded-full animate-spin mx-auto" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
             <motion.div
               key={activeDay}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="glass border border-gold/10 p-5"
+              className="glass border border-gold/20 p-8"
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-xl font-display text-white">{DAYS[activeDay].name}</h2>
-                  <p className="text-gold/60 text-xs uppercase tracking-widest mt-0.5">
-                    {getIntervalLabel(currentDay.startTime, currentDay.endTime)} hrs
+                  <h2 className="text-2xl font-display text-white">{DAYS[activeDay].name}</h2>
+                  <p className="text-gold/60 text-sm uppercase tracking-widest mt-1">
+                    {getIntervalLabel(currentDay.startTime, currentDay.endTime)} hrs de atención
                   </p>
                 </div>
                 <button
                   onClick={() => handleDayToggle(activeDay)}
                   className={`
-                    px-3 py-1.5 text-xs uppercase tracking-[0.2em] font-bold border transition-all
+                    px-5 py-2.5 text-sm uppercase tracking-[0.2em] font-bold border transition-all rounded-md
                     ${currentDay.isActive 
                       ? 'bg-gold text-primary border-gold hover:bg-gold-light' 
                       : 'text-muted border-gold/20 hover:border-gold/50'
@@ -320,69 +320,69 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-2 gap-6 mb-6">
                 <TimeSelect
-                  label="Entrada"
+                  label="Hora de entrada"
                   value={currentDay.startTime}
                   onChange={(v) => handleTimeChange(activeDay, v, currentDay.endTime)}
                   disabled={!currentDay.isActive}
                   color="gold"
                 />
                 <TimeSelect
-                  label="Salida"
+                  label="Hora de salida"
                   value={currentDay.endTime}
                   onChange={(v) => handleTimeChange(activeDay, currentDay.startTime, v)}
                   disabled={!currentDay.isActive}
                 />
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-3 mb-6">
                 {PRESET_SCHEDULES.map((preset) => (
                   <button
                     key={preset.label}
                     onClick={() => applyPreset(preset, activeDay)}
                     disabled={!currentDay.isActive}
-                    className="flex items-center gap-1 px-2 py-1 border border-gold/10 text-xs uppercase tracking-wider text-muted hover:border-gold/50 hover:text-gold transition-all disabled:opacity-30"
+                    className="flex items-center gap-2 px-4 py-2 border border-gold/20 text-sm uppercase tracking-wider text-muted hover:border-gold/50 hover:text-gold transition-all disabled:opacity-30 rounded-md"
                   >
-                    <preset.icon size={12} />
+                    <preset.icon size={14} />
                     {preset.label}
                   </button>
                 ))}
               </div>
 
-              <div className="p-3 bg-gold/5 border border-gold/10 flex items-center gap-2 text-sm">
-                <Clock size={12} className="text-gold" />
+              <div className="p-5 bg-gold/5 border border-gold/20 flex items-center gap-4 text-lg rounded-lg">
+                <Clock size={20} className="text-gold" />
                 <span className="text-white font-display">
                   {currentDay.startTime} — {currentDay.endTime}
                 </span>
               </div>
             </motion.div>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
               <button
                 onClick={copyToAll}
                 disabled={!currentDay.isActive}
-                className="w-full py-2.5 border border-gold/10 text-[10px] uppercase tracking-wider text-muted hover:border-gold/50 hover:text-gold transition-all flex items-center justify-center gap-2 disabled:opacity-30"
+                className="w-full py-4 border border-gold/20 text-sm uppercase tracking-wider text-muted hover:border-gold/50 hover:text-gold transition-all flex items-center justify-center gap-3 disabled:opacity-30 rounded-lg"
               >
-                <span>Copiar a todos los días</span>
+                <span>Copiar horario a todos los días</span>
               </button>
 
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="w-full py-3 bg-gold text-primary text-xs uppercase tracking-[0.3em] font-bold hover:bg-gold-light transition-all flex items-center justify-center gap-2"
+                className="w-full py-5 bg-gold text-primary text-base uppercase tracking-[0.3em] font-bold hover:bg-gold-light transition-all flex items-center justify-center gap-3 rounded-lg shadow-lg"
               >
                 {saving ? 'Guardando...' : 'Guardar cambios'}
               </button>
 
-              <div className="glass border border-gold/5 p-4">
-                <p className="text-[9px] text-muted/40 uppercase tracking-widest mb-2">Resumen semanal</p>
-                <div className="grid grid-cols-2 gap-1 text-[10px]">
+              <div className="glass border border-gold/10 p-6">
+                <p className="text-xs text-muted/40 uppercase tracking-widest mb-4">Resumen semanal</p>
+                <div className="grid grid-cols-2 gap-3 text-sm">
                   {availabilities.map((a, i) => (
-                    <div key={i} className="flex justify-between">
-                      <span className={a.isActive ? 'text-white/70' : 'text-muted/30'}>{DAYS[i].short}</span>
-                      <span className={a.isActive ? 'text-gold' : 'text-muted/30'}>
-                        {a.isActive ? `${a.startTime}-${a.endTime}` : '—'}
+                    <div key={i} className="flex justify-between items-center p-2 rounded bg-black/20">
+                      <span className={a.isActive ? 'text-white/70' : 'text-muted/30'}>{DAYS[i].name}</span>
+                      <span className={a.isActive ? 'text-gold font-medium' : 'text-muted/30'}>
+                        {a.isActive ? `${a.startTime} - ${a.endTime}` : '—'}
                       </span>
                     </div>
                   ))}

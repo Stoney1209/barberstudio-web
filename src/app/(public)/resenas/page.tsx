@@ -1,5 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
+import ReviewForm from '@/components/reviews/ReviewForm'
+import { createClient } from '@/lib/supabase/client'
 
 type Review = {
   id: string
@@ -18,7 +20,19 @@ const ITEMS_PER_PAGE = 10
 export default function ResenasPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
-  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
+  const [user, setUser] = useState<any>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  useEffect(() => {
+    async function checkUser() {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        setUser(session.user)
+      }
+    }
+    checkUser()
+  }, [])
 
   useEffect(() => {
     async function fetchReviews() {

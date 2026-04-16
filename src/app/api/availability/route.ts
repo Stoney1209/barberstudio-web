@@ -8,6 +8,7 @@ import {
   minutesToHHMM,
   hhmmToMinutes,
   getLocalDateString,
+  parseDateOnlyAsUTC,
   SLOT_STEP_MINUTES,
 } from '@/lib/booking-utils'
 
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Barbero no encontrado' }, { status: 404 })
     }
 
-    const dateObj = new Date(date + 'T00:00:00')
+    const dateObj = parseDateOnlyAsUTC(date)
     const dayWindow = await resolveBarberDayWindow(barberId, dateObj)
 
     if (dayWindow.status === 'closed') {

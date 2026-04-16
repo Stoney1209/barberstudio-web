@@ -56,7 +56,7 @@ model Appointment {
   clientId      String
   barberId      String
   serviceId     String
-  date          DateTime          // date (day-level granularity)
+  date          DateTime          @db.Date // date (day-level granularity)
   startTime     String            // HH:mm
   endTime       String            // HH:mm
   status        AppointmentStatus

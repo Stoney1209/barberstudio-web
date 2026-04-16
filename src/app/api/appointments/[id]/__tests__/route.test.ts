@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { GET, PUT, DELETE } from '../route'
+import { parseDateOnlyAsUTC } from '@/lib/booking-utils'
 
 const p = prisma as unknown as {
   user: { findUnique: jest.Mock }
@@ -13,7 +14,7 @@ const baseAppointment = {
   clientId: 'test-user-id',
   barberId: 'barber-1',
   serviceId: 's1',
-  date: new Date('2026-06-01T00:00:00'),
+  date: parseDateOnlyAsUTC('2026-06-01'),
   startTime: '10:00',
   endTime: '10:30',
   status: 'PENDING',

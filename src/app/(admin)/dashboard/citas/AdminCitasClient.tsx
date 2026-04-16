@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar, Clock, User, Scissors, CheckCircle2, XCircle, AlertCircle, Edit2, Trash2, Search, Filter } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastContext'
 import Link from 'next/link'
+import { formatStoredDate } from '@/lib/booking-utils'
 
 export const AdminCitasClient = ({ initialAppointments }: { initialAppointments: any[] }) => {
   const [appointments, setAppointments] = useState(initialAppointments)
@@ -140,7 +141,7 @@ export const AdminCitasClient = ({ initialAppointments }: { initialAppointments:
                              </td>
                              <td className="p-6">
                                 <div>
-                                   <p className="text-xs text-white uppercase tracking-widest">{new Date(apt.date).toLocaleDateString('es-ES', { month: 'long', day: 'numeric' })}</p>
+                                   <p className="text-xs text-white uppercase tracking-widest">{formatStoredDate(apt.date, 'es-ES', { month: 'long', day: 'numeric' })}</p>
                                    <p className="text-[10px] text-gold/60 font-bold">{apt.startTime} — {apt.endTime}</p>
                                 </div>
                              </td>

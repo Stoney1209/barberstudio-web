@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { Star, X, Check } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastContext'
+import { formatStoredDate } from '@/lib/booking-utils'
 
 type Appointment = {
   id: string
@@ -121,7 +122,7 @@ export const ReviewForm: React.FC<Props> = ({ onReviewAdded }) => {
               <option value="">-- Seleccionar --</option>
               {appointments.map((apt) => (
                 <option key={apt.id} value={apt.id}>
-                  {apt.service.name} con {apt.barber.name} - {new Date(apt.date).toLocaleDateString('es-MX')}
+                  {apt.service.name} con {apt.barber.name} - {formatStoredDate(apt.date, 'es-MX')}
                 </option>
               ))}
             </select>

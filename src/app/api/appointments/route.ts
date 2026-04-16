@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/auth'
 import { parseOffsetPagination } from '@/lib/pagination'
 import { resolveBarberDayWindow, validateAppointmentTimeWindow } from '@/lib/booking-validation'
+import { getLocalDateString, parseDateOnlyAsUTC } from '@/lib/booking-utils'
 
 // ── Fix 3: clientId ya NO se acepta desde el body — se toma de la sesión ──
 const AppointmentInput = z.object({
@@ -51,12 +52,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Cliente no encontrado' }, { status: 404 })
     }
 
-    const appointmentDate = new Date(data.date + 'T00:00:00')
-    const now = new Date()
-    now.setHours(0, 0, 0, 0)
+    const appointmentDate = parseDateOnlyAsUTC(data.date)
+    const today = getLocalDateString(new Date())
     
     // M-4: Validation for future date
-    if (appointmentDate < now) {
+    if (data.date < today) {
       return NextResponse.json({ error: 'La fecha de la cita debe ser futura' }, { status: 400 })
     }
 
@@ -154,7 +154,7 @@ export async function GET(req: NextRequest) {
       if (clientId) where.clientId = clientId
     }
 
-    if (date) where.date = new Date(date + 'T00:00:00')
+    if (date) where.date = parseDateOnlyAsUTC(date)
 
     if (status) where.status = status
 

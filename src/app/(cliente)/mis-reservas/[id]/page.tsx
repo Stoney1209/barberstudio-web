@@ -66,7 +66,7 @@ export default async function TicketPage({ params }: { params: { id: string } })
                     <Calendar className="text-gold mt-1" size={18} />
                     <div>
                        <p className="text-[9px] text-muted/40 uppercase tracking-[0.3em] mb-1">Fecha de la Cita</p>
-                       <p className="text-white font-medium uppercase tracking-widest">{appointment.date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                       <p className="text-white font-medium uppercase tracking-widest">{appointment.date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}</p>
                     </div>
                  </div>
                  <div className="flex items-start gap-4">

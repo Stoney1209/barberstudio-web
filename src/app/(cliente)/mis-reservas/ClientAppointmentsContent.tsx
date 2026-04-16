@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar, Clock, Scissors, CreditCard, ChevronRight, XCircle, Loader2, AlertTriangle, X } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastContext'
+import { formatStoredDate } from '@/lib/booking-utils'
 
 type Appointment = {
   id: string
@@ -73,10 +74,10 @@ const CancellationModal: React.FC<CancellationModalProps> = ({ appointment, isOp
                 <div className="flex items-center justify-between mb-3 pb-3 border-b border-gold/10">
                   <span className="text-xs text-gold/60 uppercase tracking-widest">Fecha</span>
                   <span className="text-white">
-                    {new Date(appointment.date).toLocaleDateString('es-ES', { 
+                    {formatStoredDate(appointment.date, 'es-ES', {
                       weekday: 'long', 
                       day: 'numeric', 
-                      month: 'long' 
+                      month: 'long',
                     })}
                   </span>
                 </div>
@@ -193,8 +194,8 @@ export const ClientAppointmentsContent: React.FC<{ initialAppointments: any[] }>
                 {/* Time & Date */}
                 <div className="flex items-center gap-6">
                   <div className="flex flex-col items-center justify-center p-4 bg-gold/5 border border-gold/10 rounded-sm min-w-[80px]">
-                    <span className="text-[10px] uppercase text-gold/60 font-black tracking-widest">{new Date(apt.date).toLocaleDateString('es-ES', { month: 'short' })}</span>
-                    <span className="text-3xl font-display text-white">{new Date(apt.date).getDate()}</span>
+                    <span className="text-[10px] uppercase text-gold/60 font-black tracking-widest">{formatStoredDate(apt.date, 'es-ES', { month: 'short' })}</span>
+                    <span className="text-3xl font-display text-white">{formatStoredDate(apt.date, 'en-US', { day: 'numeric' })}</span>
                   </div>
                   <div>
                     <div className="flex items-center gap-2 text-gold mb-1">

@@ -24,6 +24,34 @@ export function getLocalDateString(date: Date): string {
   return `${year}-${month}-${day}`
 }
 
+export function parseDateOnlyAsUTC(dateString: string): Date {
+  return new Date(`${dateString}T00:00:00.000Z`)
+}
+
+/**
+ * Obtiene la fecha en formato YYYY-MM-DD usando los métodos UTC.
+ * Útil para fechas que se guardaron como Medianoche UTC.
+ */
+export function getUTCDateString(date: Date): string {
+  const year = date.getUTCFullYear()
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(date.getUTCDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+export function getStoredDateString(value: Date | string): string {
+  return getUTCDateString(typeof value === 'string' ? new Date(value) : value)
+}
+
+export function formatStoredDate(
+  value: Date | string,
+  locale: string,
+  options?: Intl.DateTimeFormatOptions
+): string {
+  const date = typeof value === 'string' ? new Date(value) : value
+  return date.toLocaleDateString(locale, { timeZone: 'UTC', ...options })
+}
+
 export function isSlotAlignedToGrid(startMin: number): boolean {
   if (!Number.isFinite(startMin)) return false
   return startMin % SLOT_STEP_MINUTES === 0

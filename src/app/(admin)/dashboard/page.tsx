@@ -12,6 +12,7 @@ import {
   CheckCircle2, 
   AlertCircle 
 } from 'lucide-react'
+import { getLocalDateString, getStoredDateString } from '@/lib/booking-utils'
 
 type Appointment = {
   id: string
@@ -59,11 +60,10 @@ const AdminDashboard: React.FC = () => {
   }, [])
 
   const metrics = useMemo(() => {
-    const now = new Date()
-    const today = now.toISOString().slice(0, 10)
+    const today = getLocalDateString(new Date())
     
     const dayTotal = appointments
-      .filter(a => a.date === today && a.status === 'COMPLETED')
+      .filter(a => a.date && getStoredDateString(a.date) === today && a.status === 'COMPLETED')
       .reduce((acc, a) => acc + (Number(a.service?.price) ?? 0), 0)
 
     const pending = appointments.filter(a => a.status === 'PENDING').length

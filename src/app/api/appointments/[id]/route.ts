@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { requireAuth, getSessionUser } from '@/lib/auth'
+import { parseDateOnlyAsUTC } from '@/lib/booking-utils'
 
 const AppointmentUpdate = z.object({
   date: z.string().optional(),
@@ -89,7 +90,7 @@ export async function PUT(req: NextRequest, ctx: { params: { id: string } }) {
 
     const data: any = { ...parsed }
     if (parsed.date) {
-      data.date = new Date(parsed.date)
+      data.date = parseDateOnlyAsUTC(parsed.date)
     }
 
     if (parsed.startTime && parsed.endTime) {

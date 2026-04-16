@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { GET, POST } from '../route'
+import { parseDateOnlyAsUTC } from '@/lib/booking-utils'
 
 const p = prisma as unknown as {
   user: { findUnique: jest.Mock; findMany: jest.Mock }
@@ -41,7 +42,7 @@ describe('POST /api/appointments', () => {
       clientId: 'test-user-id',
       barberId,
       serviceId,
-      date: new Date(dateStr + 'T00:00:00'),
+      date: parseDateOnlyAsUTC(dateStr),
       startTime: '10:00',
       endTime: '10:30',
       status: 'PENDING',
@@ -237,7 +238,7 @@ describe('POST /api/appointments', () => {
     p.availability.findFirst.mockResolvedValue({
       id: 'av1',
       barberId: 'b1',
-      dayOfWeek: new Date(dateStr + 'T00:00:00').getDay(),
+      dayOfWeek: parseDateOnlyAsUTC(dateStr).getUTCDay(),
       startTime: '09:00',
       endTime: '12:00',
       isActive: true,
@@ -338,7 +339,7 @@ describe('GET /api/appointments', () => {
       expect.objectContaining({
         where: expect.objectContaining({
           barberId: 'b1',
-          date: new Date('2026-06-15T00:00:00'),
+          date: parseDateOnlyAsUTC('2026-06-15'),
         }),
         skip: 0,
         take: 101,

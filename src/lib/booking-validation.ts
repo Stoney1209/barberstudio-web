@@ -26,7 +26,7 @@ export type BarberDayWindow =
  * Si no tiene ninguno, se usa el horario por defecto 9:00–21:00 todos los días (onboarding).
  */
 export async function resolveBarberDayWindow(barberId: string, appointmentDate: Date): Promise<BarberDayWindow> {
-  const dayOfWeek = appointmentDate.getDay()
+  const dayOfWeek = appointmentDate.getUTCDay()
 
   const configuredActive = await prisma.availability.count({
     where: { barberId, isActive: true },

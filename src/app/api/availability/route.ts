@@ -6,6 +6,8 @@ import {
   resolveBarberDayWindow,
   slotStartsInWindow,
   minutesToHHMM,
+  hhmmToMinutes,
+  getLocalDateString,
   SLOT_STEP_MINUTES,
 } from '@/lib/booking-validation'
 
@@ -90,6 +92,14 @@ export async function GET(req: NextRequest) {
     const allSlots = slotStartsInWindow(startMin, endMin, SLOT_DURATION)
 
     const availableSlots = allSlots.filter((slot, index) => {
+      // Si la fecha es hoy, filtrar horarios pasados
+      if (date === getLocalDateString(new Date())) {
+        const now = new Date()
+        const nowMinutes = now.getHours() * 60 + now.getMinutes()
+        const slotMinutes = hhmmToMinutes(slot)
+        if (slotMinutes <= nowMinutes) return false
+      }
+
       if (occupiedSlots.includes(slot)) return false
 
       const slotsNeeded = Math.ceil(durationRequested / SLOT_DURATION)

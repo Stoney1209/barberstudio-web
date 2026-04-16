@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { getLocalDateString } from '@/lib/booking-validation'
 
 type Step = 0 | 1 | 2 | 3
 type StepLabel = 'Servicio' | 'Barbero' | 'Fecha' | 'Confirmar'
@@ -34,14 +35,14 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
   const [barberId, setBarberId] = useState<string | null>(barbers[0]?.id ?? null)
   const [barberName, setBarberName] = useState<string>(barbers[0]?.name ?? '')
   const [date, setDate] = useState<string>(() => {
-    const today = new Date()
-    return today.toISOString().split('T')[0]
+    return getLocalDateString(new Date())
   })
   const [time, setTime] = useState<string>('')
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([])
   const [loadingSlots, setLoadingSlots] = useState(false)
   /** null = sin horarios en BD → solo se bloquea domingo (comportamiento previo). Si hay filas activas, solo esos días de semana. */
   const [barberWorkingWeekdays, setBarberWorkingWeekdays] = useState<Set<number> | null>(null)
+  const [loadingBarberSchedule, setLoadingBarberSchedule] = useState(false)
   const [closedDayMessage, setClosedDayMessage] = useState<string | null>(null)
 
   useEffect(() => {
@@ -72,6 +73,7 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
     setBarberWorkingWeekdays(null)
     let cancelled = false
     async function loadBarberSchedule() {
+      setLoadingBarberSchedule(true)
       try {
         const res = await fetch(`/api/availability?barberId=${encodeURIComponent(id)}`)
         if (!res.ok || cancelled) return
@@ -86,6 +88,8 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
         }
       } catch {
         if (!cancelled) setBarberWorkingWeekdays(null)
+      } finally {
+        if (!cancelled) setLoadingBarberSchedule(false)
       }
     }
     loadBarberSchedule()
@@ -103,7 +107,7 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
       x.setHours(12, 0, 0, 0)
       x.setDate(x.getDate() + i)
       if (barberWorkingWeekdays.has(x.getDay())) {
-        setDate(x.toISOString().split('T')[0])
+        setDate(getLocalDateString(x))
         setTime('')
         return
       }
@@ -304,24 +308,38 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-muted/70 mb-3">Fecha</label>
-                    <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
-                      {Array.from({ length: 28 }, (_, i) => {
-                        const d = new Date()
-                        d.setDate(d.getDate() + i)
-                        const dateStr = d.toISOString().split('T')[0]
-                        const isSelected = date === dateStr
-                        const dayNum = d.getDay()
-                        const isClosedBySchedule = barberWorkingWeekdays !== null && !barberWorkingWeekdays.has(dayNum)
-                        const isLegacySundayOff = barberWorkingWeekdays === null && dayNum === 0
-                        const disabled = isClosedBySchedule || isLegacySundayOff
-                        return (
-                          <button key={i} onClick={() => { setDate(dateStr); setTime('') }} disabled={disabled} className={`p-3 rounded-lg text-center transition-all ${isSelected ? 'bg-gold text-primary' : disabled ? 'bg-surface-2/50 text-muted/30 cursor-not-allowed' : 'bg-surface-2 border border-gold/10 hover:border-gold/30 text-white'}`}>
-                            <p className="text-xs text-muted mb-1">{d.toLocaleDateString('es-MX', { weekday: 'short' })}</p>
-                            <p className="text-lg font-medium">{d.getDate()}</p>
-                          </button>
-                        )
-                      })}
-                    </div>
+                    {loadingBarberSchedule ? (
+                      <div className="flex justify-center py-8">
+                        <div className="w-6 h-6 border-2 border-gold/20 border-t-gold rounded-full animate-spin" />
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+                        {Array.from({ length: 28 }, (_, i) => {
+                          const d = new Date()
+                          d.setHours(12, 0, 0, 0) // Centrar el día
+                          d.setDate(d.getDate() + i)
+                          const dateStr = getLocalDateString(d)
+                          const isSelected = date === dateStr
+                          const dayNum = d.getDay()
+                          /** Legacy: Domingo siempre inhábil si no hay records. */
+                          const isLegacySundayOff = barberWorkingWeekdays === null && dayNum === 0
+                          const isClosedBySchedule = barberWorkingWeekdays !== null && !barberWorkingWeekdays.has(dayNum)
+                          const disabled = isClosedBySchedule || isLegacySundayOff
+                          
+                          return (
+                            <button 
+                              key={i} 
+                              onClick={() => { setDate(dateStr); setTime('') }} 
+                              disabled={disabled} 
+                              className={`p-3 rounded-lg text-center transition-all ${isSelected ? 'bg-gold text-primary' : disabled ? 'bg-surface-2/50 text-muted/30 cursor-not-allowed' : 'bg-surface-2 border border-gold/10 hover:border-gold/30 text-white'}`}
+                            >
+                              <p className="text-xs text-muted mb-1">{d.toLocaleDateString('es-MX', { weekday: 'short' })}</p>
+                              <p className="text-lg font-medium">{d.getDate()}</p>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
                   </div>
                   
                   {date && (

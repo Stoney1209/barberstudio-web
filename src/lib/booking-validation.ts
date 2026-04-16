@@ -67,6 +67,13 @@ export async function resolveBarberDayWindow(barberId: string, appointmentDate: 
   }
 }
 
+export function getLocalDateString(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export function isSlotAlignedToGrid(startMin: number): boolean {
   if (!Number.isFinite(startMin)) return false
   return startMin % SLOT_STEP_MINUTES === 0

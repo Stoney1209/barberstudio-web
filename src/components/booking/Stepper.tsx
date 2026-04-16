@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { getLocalDateString } from '@/lib/booking-validation'
+import { getLocalDateString } from '@/lib/booking-utils'
 
 type Step = 0 | 1 | 2 | 3
 type StepLabel = 'Servicio' | 'Barbero' | 'Fecha' | 'Confirmar'

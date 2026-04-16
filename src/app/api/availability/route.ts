@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { requireRole } from '@/lib/auth'
+import { resolveBarberDayWindow } from '@/lib/booking-validation'
 import {
-  resolveBarberDayWindow,
   slotStartsInWindow,
   minutesToHHMM,
   hhmmToMinutes,
   getLocalDateString,
   SLOT_STEP_MINUTES,
-} from '@/lib/booking-validation'
+} from '@/lib/booking-utils'
 
 const SLOT_DURATION = SLOT_STEP_MINUTES
 

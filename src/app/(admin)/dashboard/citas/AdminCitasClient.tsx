@@ -61,22 +61,22 @@ export const AdminCitasClient = ({ initialAppointments }: { initialAppointments:
         <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
              <p className="text-gold/40 text-[10px] uppercase tracking-[0.4em] mb-4">Gestión de Reservas</p>
-             <h1 className="text-6xl font-display text-white italic">Libro de <span className="text-gold">Citas</span></h1>
+             <h1 className="text-4xl md:text-6xl font-display text-white italic">Libro de <span className="text-gold">Citas</span></h1>
           </motion.div>
 
-          <div className="flex items-center gap-4">
-             <div className="relative group">
+          <div className="flex flex-col-reverse md:flex-row md:items-center gap-4 w-full md:w-auto">
+             <div className="relative group w-full md:w-auto">
                 <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted/40 group-focus-within:text-gold transition-colors" />
                 <input 
                   type="text" 
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
                   placeholder="Buscar por cliente, barbero..."
-                  className="bg-black/40 border border-gold/10 pl-12 pr-6 py-4 rounded-sm text-xs text-white outline-none focus:border-gold/30 min-w-[300px] transition-all"
+                  className="w-full md:min-w-[300px] bg-black/40 border border-gold/10 pl-12 pr-6 py-4 rounded-sm text-xs text-white outline-none focus:border-gold/30 transition-all"
                 />
              </div>
-             <Link href="/dashboard" className="text-[10px] text-muted/40 uppercase tracking-widest hover:text-gold transition-colors ml-4">
-                Dashboard / Citas
+             <Link href="/dashboard" className="text-[10px] text-muted/40 uppercase tracking-widest hover:text-gold transition-colors self-start md:self-auto md:ml-4 whitespace-nowrap">
+                Dashboard / <span className="text-gold/70">Citas</span>
              </Link>
           </div>
         </header>

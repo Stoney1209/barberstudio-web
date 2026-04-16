@@ -101,18 +101,18 @@ export default function AdminBarbersClient({ initialBarbers }: { initialBarbers:
     <div className="min-h-screen bg-gradient-mesh bg-noise pt-12 pb-24 px-6 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         
-        <header className="mb-16 flex items-end justify-between border-b border-gold/5 pb-8">
+        <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gold/5 pb-8">
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
           >
             <p className="text-gold/60 text-xs uppercase tracking-[0.4em] mb-4">Gestión de Personal</p>
-            <h1 className="text-6xl font-display text-white italic">Barberos</h1>
+            <h1 className="text-4xl md:text-6xl font-display text-white italic">Barberos</h1>
           </motion.div>
           
-          <div className="flex items-center gap-6">
-            <Link href="/dashboard" className="text-[10px] text-muted/40 uppercase tracking-widest hover:text-gold transition-colors">
-              Panel / Barberos
+          <div className="flex w-full md:w-auto items-center gap-6">
+            <Link href="/dashboard" className="text-[10px] text-muted/40 uppercase tracking-widest hover:text-gold transition-colors whitespace-nowrap">
+              Panel / <span className="text-gold/70">Barberos</span>
             </Link>
           </div>
         </header>

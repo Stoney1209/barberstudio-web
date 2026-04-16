@@ -100,18 +100,18 @@ export default function AdminServicesClient({ initialServices }: { initialServic
     <div className="min-h-screen bg-gradient-mesh bg-noise pt-12 pb-24 px-6">
       <div className="max-w-6xl mx-auto">
         
-        <header className="mb-16 flex items-end justify-between border-b border-gold/5 pb-8">
+        <header className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gold/5 pb-8">
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             <p className="text-gold/60 text-xs uppercase tracking-[0.4em] mb-4">Catálogo Maestro</p>
-            <h1 className="text-6xl font-display text-white italic">Servicios</h1>
+            <h1 className="text-4xl md:text-6xl font-display text-white italic">Servicios</h1>
           </motion.div>
           
           <button 
             onClick={() => { setEditingService(null); setShowModal(true) }}
-            className="flex items-center gap-2 px-8 py-3 bg-gold text-primary font-bold text-[10px] uppercase tracking-widest shadow-glow hover:shadow-glow-lg transition-all"
+            className="flex w-full md:w-auto items-center justify-center gap-2 px-8 py-3 bg-gold text-primary font-bold text-[10px] uppercase tracking-widest shadow-glow hover:shadow-glow-lg transition-all"
           >
             <Plus size={14} />
             Nuevo Servicio

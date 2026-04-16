@@ -1,11 +1,17 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion'
 import Stepper from '@/components/booking/Stepper'
 import { useToast } from '@/components/ui/ToastContext'
 
 type ServiceOption = { id: string; name: string; duration: number; price: number; category: string }
 type BarberOption = { id: string; name: string }
+type BookingCompleteData = {
+  barberId: string
+  serviceId: string
+  date: string
+  startTime: string
+  endTime: string
+}
 
 const ReservarPage: React.FC = () => {
   const [services, setServices] = useState<ServiceOption[]>([])
@@ -39,7 +45,7 @@ const ReservarPage: React.FC = () => {
 
   // No local state handles redirect now, logic inside handleComplete
 
-  const handleComplete = async (data: any) => {
+  const handleComplete = async (data: BookingCompleteData) => {
     setIsSubmitting(true)
     
     const payload = {

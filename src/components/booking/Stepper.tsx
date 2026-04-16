@@ -9,8 +9,20 @@ type StepLabel = 'Servicio' | 'Barbero' | 'Fecha' | 'Confirmar'
 type ServiceOption = { id: string; name: string; duration: number; price: number; category: string }
 type BarberOption = { id: string; name: string }
 type TimeSlot = { time: string; available: boolean }
+type BookingCompletePayload = {
+  serviceId: string
+  serviceName: string
+  servicePrice: number
+  serviceCategory: string
+  duration: number
+  barberId: string
+  barberName: string
+  date: string
+  startTime: string
+  endTime: string
+}
 type Props = {
-  onComplete?: (data: any) => void
+  onComplete?: (data: BookingCompletePayload) => void
   services?: ServiceOption[]
   barbers?: BarberOption[]
   isSubmitting?: boolean

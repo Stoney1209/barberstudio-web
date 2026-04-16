@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  Clock, Save, User, 
+import {
+  Clock, User,
   Zap, Moon, Sun, Coffee,
-  ChevronDown, Search, X
+  ChevronDown,
 } from 'lucide-react'
 
 type Barber = {
@@ -26,10 +26,10 @@ const DAYS = [
   { key: 0, name: 'Domingo', short: 'DOM', icon: Sun },
   { key: 1, name: 'Lunes', short: 'LUN', icon: Moon },
   { key: 2, name: 'Martes', short: 'MAR', icon: Moon },
-  { key: 3, name: 'Miércoles', short: 'MIE', icon: Moon },
+  { key: 3, name: 'Miercoles', short: 'MIE', icon: Moon },
   { key: 4, name: 'Jueves', short: 'JUE', icon: Moon },
   { key: 5, name: 'Viernes', short: 'VIE', icon: Moon },
-  { key: 6, name: 'Sábado', short: 'SAB', icon: Sun },
+  { key: 6, name: 'Sabado', short: 'SAB', icon: Sun },
 ]
 
 const TIME_SLOTS = [
@@ -41,7 +41,7 @@ const TIME_SLOTS = [
 ]
 
 const PRESET_SCHEDULES = [
-  { label: 'Mañana', start: '09:00', end: '14:00', icon: Zap },
+  { label: 'Manana', start: '09:00', end: '14:00', icon: Zap },
   { label: 'Tarde', start: '14:00', end: '19:00', icon: Sun },
   { label: 'Completo', start: '09:00', end: '21:00', icon: Clock },
   { label: 'Medio', start: '10:00', end: '18:00', icon: Coffee },
@@ -60,7 +60,7 @@ function TimeSelect({ label, value, onChange, disabled, color = 'white' }: TimeS
   const [search, setSearch] = useState('')
   const ref = useRef<HTMLDivElement>(null)
 
-  const filteredSlots = TIME_SLOTS.filter(t => 
+  const filteredSlots = TIME_SLOTS.filter((t) =>
     t.includes(search) || search === ''
   )
 
@@ -84,7 +84,7 @@ function TimeSelect({ label, value, onChange, disabled, color = 'white' }: TimeS
           onClick={() => !disabled && setOpen(!open)}
           disabled={disabled}
           className={`
-            w-full flex items-center justify-between gap-3 px-6 py-4 
+            w-full flex items-center justify-between gap-3 px-6 py-4
             bg-black/40 border border-gold/20 text-xl font-display
             ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer hover:border-gold/40'}
             ${open ? 'border-gold/40' : ''}
@@ -114,7 +114,7 @@ function TimeSelect({ label, value, onChange, disabled, color = 'white' }: TimeS
                 />
               </div>
               <div className="max-h-60 overflow-y-auto py-2">
-                {filteredSlots.map(t => (
+                {filteredSlots.map((t) => (
                   <button
                     key={t}
                     type="button"
@@ -156,7 +156,7 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
       const res = await fetch(`/api/availability?barberId=${selectedBarberId}`)
       const data = await res.json()
       const fullWeek = DAYS.map((_, i) => {
-        const existing = data.availabilities?.find((a: any) => a.dayOfWeek === i)
+        const existing = data.availabilities?.find((a: Availability) => a.dayOfWeek === i)
         return existing || { dayOfWeek: i, startTime: '09:00', endTime: '18:00', isActive: false }
       })
       setAvailabilities(fullWeek)
@@ -169,11 +169,11 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
     setSaving(true)
     try {
       await Promise.all(
-        availabilities.map(item =>
+        availabilities.map((item) =>
           fetch('/api/availability', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ barberId: selectedBarberId, ...item })
+            body: JSON.stringify({ barberId: selectedBarberId, ...item }),
           })
         )
       )
@@ -203,14 +203,14 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
 
   const copyToAll = () => {
     const source = availabilities[activeDay]
-    const newAvail = availabilities.map((_, i) => ({
-      ..._,
+    const newAvail = availabilities.map((item) => ({
+      ...item,
       startTime: source.startTime,
       endTime: source.endTime,
       isActive: source.isActive,
     }))
     setAvailabilities(newAvail)
-    setToast('Copiado a todos los días')
+    setToast('Copiado a todos los dias')
     setTimeout(() => setToast(null), 2000)
   }
 
@@ -251,14 +251,14 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
               onChange={(e) => setSelectedBarberId(e.target.value)}
               className="w-full bg-surface-2/40 border border-gold/10 p-3 pl-11 text-sm tracking-widest text-white outline-none focus:border-gold/50 appearance-none transition-all font-bold rounded-md"
             >
-              {initialBarbers.map(b => (
+              {initialBarbers.map((b) => (
                 <option key={b.id} value={b.id} className="bg-surface-2">{b.name || b.email}</option>
               ))}
             </select>
           </div>
         </header>
 
-        <div className="grid grid-cols-7 gap-2 mb-8">
+        <div className="grid grid-cols-4 md:grid-cols-7 gap-2 mb-8">
           {DAYS.map((day, idx) => {
             const avail = availabilities[idx]
             const isActive = avail?.isActive
@@ -269,16 +269,16 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
                 onClick={() => setActiveDay(idx)}
                 className={`
                   relative p-4 border transition-all duration-300 flex flex-col items-center gap-2 rounded-lg
-                  ${activeDay === idx 
-                    ? 'border-gold bg-gold/10 text-gold' 
-                    : isActive 
+                  ${activeDay === idx
+                    ? 'border-gold bg-gold/10 text-gold'
+                    : isActive
                       ? 'border-gold/30 bg-gold/5/30 text-white/80 hover:border-gold/50'
                       : 'border-gold/5 text-muted/40 hover:border-gold/20'
                   }
                 `}
               >
                 <Icon size={20} />
-                <span className="text-sm uppercase tracking-wider font-medium">{day.short}</span>
+                <span className="text-xs md:text-sm uppercase tracking-wider font-medium">{day.short}</span>
                 {isActive && (
                   <div className="absolute top-3 right-3 w-2.5 h-2.5 bg-gold rounded-full shadow-glow" />
                 )}
@@ -303,15 +303,15 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
                 <div>
                   <h2 className="text-2xl font-display text-white">{DAYS[activeDay].name}</h2>
                   <p className="text-gold/60 text-sm uppercase tracking-widest mt-1">
-                    {getIntervalLabel(currentDay.startTime, currentDay.endTime)} hrs de atención
+                    {getIntervalLabel(currentDay.startTime, currentDay.endTime)} hrs de atencion
                   </p>
                 </div>
                 <button
                   onClick={() => handleDayToggle(activeDay)}
                   className={`
                     px-5 py-2.5 text-sm uppercase tracking-[0.2em] font-bold border transition-all rounded-md
-                    ${currentDay.isActive 
-                      ? 'bg-gold text-primary border-gold hover:bg-gold-light' 
+                    ${currentDay.isActive
+                      ? 'bg-gold text-primary border-gold hover:bg-gold-light'
                       : 'text-muted border-gold/20 hover:border-gold/50'
                     }
                   `}
@@ -320,7 +320,7 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                 <TimeSelect
                   label="Hora de entrada"
                   value={currentDay.startTime}
@@ -353,7 +353,7 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
               <div className="p-5 bg-gold/5 border border-gold/20 flex items-center gap-4 text-lg rounded-lg">
                 <Clock size={20} className="text-gold" />
                 <span className="text-white font-display">
-                  {currentDay.startTime} — {currentDay.endTime}
+                  {currentDay.startTime} - {currentDay.endTime}
                 </span>
               </div>
             </motion.div>
@@ -364,7 +364,7 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
                 disabled={!currentDay.isActive}
                 className="w-full py-4 border border-gold/20 text-sm uppercase tracking-wider text-muted hover:border-gold/50 hover:text-gold transition-all flex items-center justify-center gap-3 disabled:opacity-30 rounded-lg"
               >
-                <span>Copiar horario a todos los días</span>
+                <span>Copiar horario a todos los dias</span>
               </button>
 
               <button
@@ -377,12 +377,12 @@ export default function AdminAvailabilityClient({ initialBarbers }: { initialBar
 
               <div className="glass border border-gold/10 p-6">
                 <p className="text-xs text-muted/40 uppercase tracking-widest mb-4">Resumen semanal</p>
-                <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                   {availabilities.map((a, i) => (
                     <div key={i} className="flex justify-between items-center p-2 rounded bg-black/20">
                       <span className={a.isActive ? 'text-white/70' : 'text-muted/30'}>{DAYS[i].name}</span>
                       <span className={a.isActive ? 'text-gold font-medium' : 'text-muted/30'}>
-                        {a.isActive ? `${a.startTime} - ${a.endTime}` : '—'}
+                        {a.isActive ? `${a.startTime} - ${a.endTime}` : '-'}
                       </span>
                     </div>
                   ))}

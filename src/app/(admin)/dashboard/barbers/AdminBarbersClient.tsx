@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, Mail, Phone, Calendar, Clock, Scissors } from 'lucide-react'
+import { Plus, Edit2, Trash2, Mail, Phone, Scissors } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastContext'
 
 type Barber = {

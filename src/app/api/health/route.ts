@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const checks: Record<string, string> = {}
   let allHealthy = true
 
@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   try {
     await prisma.$queryRaw`SELECT 1`
     checks.database = 'healthy'
-  } catch (err) {
+  } catch {
     checks.database = 'unhealthy'
     allHealthy = false
   }

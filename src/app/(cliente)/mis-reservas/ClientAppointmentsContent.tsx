@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, Clock, Scissors, CreditCard, ChevronRight, XCircle, Loader2, AlertTriangle, X } from 'lucide-react'
+import { Calendar, Clock, Scissors, CreditCard, XCircle, Loader2, AlertTriangle, X } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastContext'
 import { formatStoredDate } from '@/lib/booking-utils'
 
@@ -129,7 +129,7 @@ const CancellationModal: React.FC<CancellationModalProps> = ({ appointment, isOp
   </AnimatePresence>
 )
 
-export const ClientAppointmentsContent: React.FC<{ initialAppointments: any[] }> = ({ initialAppointments }) => {
+export const ClientAppointmentsContent: React.FC<{ initialAppointments: Appointment[] }> = ({ initialAppointments }) => {
   const { showToast } = useToast()
   const [appointments, setAppointments] = useState(initialAppointments)
   const [cancelling, setCancelling] = useState<string | null>(null)

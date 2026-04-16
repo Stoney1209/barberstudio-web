@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { requireAuth, getSessionUser } from '@/lib/auth'
+import { requireAuth } from '@/lib/auth'
 import { parseDateOnlyAsUTC } from '@/lib/booking-utils'
 
 const AppointmentUpdate = z.object({
@@ -12,6 +12,15 @@ const AppointmentUpdate = z.object({
   paymentStatus: z.enum(['PENDING', 'PAID', 'PARTIALLY_PAID', 'CANCELLED']).optional(),
   notes: z.string().optional(),
 })
+
+type AppointmentUpdateData = Partial<{
+  date: Date
+  startTime: string
+  endTime: string
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED'
+  paymentStatus: 'PENDING' | 'PAID' | 'PARTIALLY_PAID' | 'CANCELLED'
+  notes: string
+}>
 
 /**
  * Helper: verifica que el usuario autenticado pueda acceder a esta cita.
@@ -88,7 +97,7 @@ export async function PUT(req: NextRequest, ctx: { params: { id: string } }) {
     const body = await req.json()
     const parsed = AppointmentUpdate.parse(body)
 
-    const data: any = { ...parsed }
+    const data: AppointmentUpdateData = { ...parsed }
     if (parsed.date) {
       data.date = parseDateOnlyAsUTC(parsed.date)
     }

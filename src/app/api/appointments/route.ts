@@ -5,6 +5,7 @@ import { requireAuth } from '@/lib/auth'
 import { parseOffsetPagination } from '@/lib/pagination'
 import { resolveBarberDayWindow, validateAppointmentTimeWindow } from '@/lib/booking-validation'
 import { getLocalDateString, parseDateOnlyAsUTC } from '@/lib/booking-utils'
+import type { Prisma } from '@prisma/client'
 
 // ── Fix 3: clientId ya NO se acepta desde el body — se toma de la sesión ──
 const AppointmentInput = z.object({
@@ -15,6 +16,8 @@ const AppointmentInput = z.object({
   endTime: z.string(),
   notes: z.string().optional(),
 })
+
+type ConflictError = Error & { code?: string }
 
 async function verifyBarber(barberId: string) {
   const barber = await prisma.user.findUnique({ where: { id: barberId } })
@@ -95,8 +98,8 @@ export async function POST(req: NextRequest) {
 
       if (existing) {
         // Lanzar un error reconocible para el catch externo
-        const err = new Error('CONFLICT')
-        ;(err as any).code = 'CONFLICT'
+        const err: ConflictError = new Error('CONFLICT')
+        err.code = 'CONFLICT'
         throw err
       }
 
@@ -116,8 +119,9 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json({ appointment }, { status: 201 })
-  } catch (err: any) {
-    if (err?.code === 'CONFLICT') {
+  } catch (err: unknown) {
+    const maybeConflict = err as ConflictError
+    if (maybeConflict?.code === 'CONFLICT') {
       return NextResponse.json({ error: 'Conflicto de horario' }, { status: 409 })
     }
     if (err instanceof z.ZodError) {
@@ -143,7 +147,7 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status')
     const forReview = searchParams.get('forReview')
 
-    const where: any = {}
+    const where: Prisma.AppointmentWhereInput = {}
 
     // ADMIN y BARBER pueden filtrar por cualquier barbero/cliente
     // CLIENT solo puede ver sus propias citas

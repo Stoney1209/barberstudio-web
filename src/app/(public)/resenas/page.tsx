@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import ReviewForm from '@/components/reviews/ReviewForm'
 import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 
 type Review = {
   id: string
@@ -20,7 +21,7 @@ const ITEMS_PER_PAGE = 10
 export default function ResenasPage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
 
@@ -50,7 +51,6 @@ export default function ResenasPage() {
     fetchReviews()
   }, [])
 
-  const visibleReviews = reviews.slice(0, visibleCount)
   const hasMore = visibleCount < reviews.length
 
   const loadMore = () => setVisibleCount(c => c + ITEMS_PER_PAGE)
@@ -127,7 +127,7 @@ export default function ResenasPage() {
 
             {reviews.length > 0 ? (
               <div className="space-y-4">
-                {reviews.map((review) => (
+                {reviews.slice(0, visibleCount).map((review) => (
                   <div 
                     key={review.id}
                     className="glass p-6 border border-gold/10 rounded-lg"

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, Lock, ArrowRight, Scissors, User } from 'lucide-react'
+import type { AuthError } from '@supabase/supabase-js'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -21,7 +22,7 @@ export default function LoginPage() {
     setError(null)
 
     const supabase = createClient()
-    
+
     try {
       if (view === 'register') {
         const { error } = await supabase.auth.signUp({
@@ -30,8 +31,8 @@ export default function LoginPage() {
           options: {
             data: {
               full_name: name,
-            }
-          }
+            },
+          },
         })
         if (error) throw error
         setError('Revisa tu correo para confirmar tu registro.')
@@ -52,15 +53,18 @@ export default function LoginPage() {
               return
             }
           }
-        } catch (e) {
+        } catch {
           // Ignorar error y mandar a inicio
         }
 
         router.push('/')
         router.refresh()
       }
-    } catch (error: any) {
-      setError(error.message || 'Ocurrió un error')
+    } catch (error: unknown) {
+      const message = error && typeof error === 'object' && 'message' in error
+        ? String((error as AuthError).message)
+        : 'Ocurrio un error'
+      setError(message)
     } finally {
       setLoading(false)
     }
@@ -73,7 +77,7 @@ export default function LoginPage() {
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-gold/3 rounded-full blur-2xl" />
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md relative z-10"
@@ -89,13 +93,13 @@ export default function LoginPage() {
               Barber<span className="text-gold group-hover:text-white transition-colors">Studio</span>
             </span>
           </Link>
-          <motion.p 
+          <motion.p
             key={view}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-muted/60 mt-4 text-lg font-display italic"
           >
-            {view === 'login' ? 'Bienvenido de nuevo' : 'Únete a la experiencia'}
+            {view === 'login' ? 'Bienvenido de nuevo' : 'Unete a la experiencia'}
           </motion.p>
         </div>
 
@@ -140,7 +144,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs text-muted/60 uppercase tracking-widest mb-2">Contraseña</label>
+              <label className="block text-xs text-muted/60 uppercase tracking-widest mb-2">Contrasena</label>
               <div className="relative">
                 <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted/40" />
                 <input
@@ -149,7 +153,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-black/40 border border-gold/10 p-4 pl-12 text-white placeholder-muted/40 outline-none focus:border-gold/40 transition-all"
-                  placeholder="••••••••"
+                  placeholder="********"
                 />
               </div>
             </div>
@@ -195,16 +199,16 @@ export default function LoginPage() {
               }}
               className="text-muted/50 hover:text-gold text-sm transition-colors"
             >
-              {view === 'login' 
-                ? '¿No tienes cuenta? ' 
-                : '¿Ya tienes cuenta? '}
-              <span className="text-gold">{view === 'login' ? 'Regístrate' : 'Inicia sesión'}</span>
+              {view === 'login'
+                ? 'No tienes cuenta? '
+                : 'Ya tienes cuenta? '}
+              <span className="text-gold">{view === 'login' ? 'Registrate' : 'Inicia sesion'}</span>
             </button>
           </div>
         </div>
 
         <p className="text-center text-muted/30 text-xs mt-8">
-          © 2024 BarberStudio • El arte de la barbería
+          © 2024 BarberStudio · El arte de la barberia
         </p>
       </motion.div>
     </div>

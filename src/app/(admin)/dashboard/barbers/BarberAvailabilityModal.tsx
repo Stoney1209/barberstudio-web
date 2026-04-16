@@ -16,10 +16,10 @@ const DAYS = [
   { key: 0, name: 'Domingo', short: 'DOM', icon: Sun },
   { key: 1, name: 'Lunes', short: 'LUN', icon: Moon },
   { key: 2, name: 'Martes', short: 'MAR', icon: Moon },
-  { key: 3, name: 'Miércoles', short: 'MIE', icon: Moon },
+  { key: 3, name: 'Miercoles', short: 'MIE', icon: Moon },
   { key: 4, name: 'Jueves', short: 'JUE', icon: Moon },
   { key: 5, name: 'Viernes', short: 'VIE', icon: Moon },
-  { key: 6, name: 'Sábado', short: 'SAB', icon: Sun },
+  { key: 6, name: 'Sabado', short: 'SAB', icon: Sun },
 ]
 
 const TIME_SLOTS = [
@@ -31,20 +31,20 @@ const TIME_SLOTS = [
 ]
 
 const PRESETS = [
-  { label: 'Mañana', start: '09:00', end: '14:00', icon: Zap },
+  { label: 'Manana', start: '09:00', end: '14:00', icon: Zap },
   { label: 'Tarde', start: '14:00', end: '19:00', icon: Sun },
   { label: 'Completo', start: '09:00', end: '21:00', icon: Clock },
   { label: 'Medio', start: '10:00', end: '18:00', icon: Coffee },
 ]
 
-export const BarberAvailabilityModal = ({ 
-  barberId, 
-  barberName, 
-  onClose 
-}: { 
-  barberId: string, 
-  barberName: string, 
-  onClose: () => void 
+export const BarberAvailabilityModal = ({
+  barberId,
+  barberName,
+  onClose,
+}: {
+  barberId: string,
+  barberName: string,
+  onClose: () => void
 }) => {
   const [availabilities, setAvailabilities] = useState<Availability[]>([])
   const [loading, setLoading] = useState(true)
@@ -62,7 +62,7 @@ export const BarberAvailabilityModal = ({
       const res = await fetch(`/api/availability?barberId=${barberId}`)
       const data = await res.json()
       const fullWeek = DAYS.map((_, i) => {
-        const existing = data.availabilities?.find((a: any) => a.dayOfWeek === i)
+        const existing = data.availabilities?.find((a: Availability) => a.dayOfWeek === i)
         return existing || { dayOfWeek: i, startTime: '09:00', endTime: '18:00', isActive: false }
       })
       setAvailabilities(fullWeek)
@@ -75,11 +75,11 @@ export const BarberAvailabilityModal = ({
     setSaving(true)
     try {
       await Promise.all(
-        availabilities.map(item =>
+        availabilities.map((item) =>
           fetch('/api/availability', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ barberId, ...item })
+            body: JSON.stringify({ barberId, ...item }),
           })
         )
       )
@@ -91,7 +91,7 @@ export const BarberAvailabilityModal = ({
   }
 
   const handleDayToggle = (idx: number) => {
-    setAvailabilities(prev => {
+    setAvailabilities((prev) => {
       const next = [...prev]
       next[idx] = { ...next[idx], isActive: !next[idx].isActive }
       return next
@@ -100,7 +100,7 @@ export const BarberAvailabilityModal = ({
   }
 
   const handleTimeChange = (start: string, end: string) => {
-    setAvailabilities(prev => {
+    setAvailabilities((prev) => {
       const next = [...prev]
       next[activeDay] = { ...next[activeDay], startTime: start, endTime: end }
       return next
@@ -113,7 +113,7 @@ export const BarberAvailabilityModal = ({
 
   const copyToAll = () => {
     const source = availabilities[activeDay]
-    const next = availabilities.map(a => ({
+    const next = availabilities.map((a) => ({
       ...a,
       startTime: source.startTime,
       endTime: source.endTime,
@@ -134,14 +134,14 @@ export const BarberAvailabilityModal = ({
 
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 bg-black/95 backdrop-blur-xl"
         onClick={onClose}
       />
-      
+
       {toast && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -152,7 +152,7 @@ export const BarberAvailabilityModal = ({
         </motion.div>
       )}
 
-      <motion.div 
+      <motion.div
         initial={{ scale: 0.9, opacity: 0, y: 50 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         className="glass border border-gold/10 w-full max-w-3xl max-h-[90vh] overflow-y-auto relative z-10"
@@ -173,7 +173,7 @@ export const BarberAvailabilityModal = ({
           </div>
         ) : (
           <div className="p-6 space-y-4">
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-4 sm:grid-cols-7 gap-1">
               {DAYS.map((day, idx) => {
                 const avail = availabilities[idx]
                 const Icon = day.icon
@@ -182,10 +182,10 @@ export const BarberAvailabilityModal = ({
                     key={day.key}
                     onClick={() => setActiveDay(idx)}
                     className={`
-                      relative p-2 border flex flex-col items-center gap-1 transition-all
-                      ${activeDay === idx 
-                        ? 'border-gold bg-gold/5 text-gold' 
-                        : avail?.isActive 
+                      relative p-2 border flex flex-col items-center gap-1 transition-all rounded
+                      ${activeDay === idx
+                        ? 'border-gold bg-gold/5 text-gold'
+                        : avail?.isActive
                           ? 'border-gold/20 text-white/80 hover:border-gold/40'
                           : 'border-gold/5 text-muted/40'
                       }
@@ -201,15 +201,15 @@ export const BarberAvailabilityModal = ({
               })}
             </div>
 
-            <div className="border border-gold/10 p-4">
+            <div className="border border-gold/10 p-4 rounded-lg">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-display text-white">{DAYS[activeDay].name}</h3>
                 <button
                   onClick={() => handleDayToggle(activeDay)}
                   className={`
-                    px-3 py-1 text-[10px] uppercase tracking-wider border transition-all
-                    ${currentDay.isActive 
-                      ? 'bg-gold text-primary border-gold' 
+                    px-3 py-1 text-[10px] uppercase tracking-wider border transition-all rounded
+                    ${currentDay.isActive
+                      ? 'bg-gold text-primary border-gold'
                       : 'text-muted border-gold/20'
                     }
                   `}
@@ -218,32 +218,32 @@ export const BarberAvailabilityModal = ({
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                 <select
                   value={currentDay.startTime}
                   onChange={(e) => handleTimeChange(e.target.value, currentDay.endTime)}
                   disabled={!currentDay.isActive}
-                  className="bg-black/40 border border-gold/10 p-2 text-sm font-display text-gold disabled:opacity-30"
+                  className="bg-black/40 border border-gold/10 p-2 text-sm font-display text-gold disabled:opacity-30 rounded"
                 >
-                  {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
+                  {TIME_SLOTS.map((t) => <option key={t} value={t}>{t}</option>)}
                 </select>
                 <select
                   value={currentDay.endTime}
                   onChange={(e) => handleTimeChange(currentDay.startTime, e.target.value)}
                   disabled={!currentDay.isActive}
-                  className="bg-black/40 border border-gold/10 p-2 text-sm font-display text-white disabled:opacity-30"
+                  className="bg-black/40 border border-gold/10 p-2 text-sm font-display text-white disabled:opacity-30 rounded"
                 >
-                  {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
+                  {TIME_SLOTS.map((t) => <option key={t} value={t}>{t}</option>)}
                 </select>
               </div>
 
               <div className="flex flex-wrap gap-2 mb-4">
-                {PRESETS.map(p => (
+                {PRESETS.map((p) => (
                   <button
                     key={p.label}
                     onClick={() => applyPreset(p)}
                     disabled={!currentDay.isActive}
-                    className="flex items-center gap-1 px-2 py-1 border border-gold/10 text-[10px] text-muted hover:border-gold/50 disabled:opacity-30"
+                    className="flex items-center gap-1 px-2 py-1 border border-gold/10 text-[10px] text-muted hover:border-gold/50 disabled:opacity-30 rounded"
                   >
                     <p.icon size={10} />
                     {p.label}
@@ -253,36 +253,36 @@ export const BarberAvailabilityModal = ({
 
               <div className="flex items-center gap-2 text-xs text-muted/60">
                 <Clock size={12} className="text-gold" />
-                {currentDay.startTime} — {currentDay.endTime}
+                {currentDay.startTime} - {currentDay.endTime}
                 {currentDay.isActive && <span>({getHours(currentDay.startTime, currentDay.endTime)}h)</span>}
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <button
                 onClick={copyToAll}
                 disabled={!currentDay.isActive}
-                className="flex-1 py-2 border border-gold/10 text-[10px] text-muted hover:border-gold/50 disabled:opacity-30 flex items-center justify-center gap-1"
+                className="flex-1 py-2 border border-gold/10 text-[10px] text-muted hover:border-gold/50 disabled:opacity-30 flex items-center justify-center gap-1 rounded"
               >
                 <RotateCcw size={12} /> Copiar a todos
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex-1 py-2 bg-gold text-primary text-[10px] font-bold flex items-center justify-center gap-1"
+                className="flex-1 py-2 bg-gold text-primary text-[10px] font-bold flex items-center justify-center gap-1 rounded"
               >
                 {saving ? '...' : <><Save size={12} /> Guardar</>}
               </button>
             </div>
 
-            <div className="p-3 bg-gold/5 border border-gold/10">
+            <div className="p-3 bg-gold/5 border border-gold/10 rounded">
               <p className="text-[10px] text-muted/50 mb-2">Resumen</p>
-              <div className="grid grid-cols-4 gap-2 text-[10px]">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px]">
                 {availabilities.map((a, i) => (
-                  <div key={i} className="flex justify-between">
+                  <div key={i} className="flex justify-between gap-2">
                     <span className={a.isActive ? 'text-white/70' : 'text-muted/30'}>{DAYS[i].short}</span>
                     <span className={a.isActive ? 'text-gold' : 'text-muted/30'}>
-                      {a.isActive ? `${a.startTime}-${a.endTime}` : '—'}
+                      {a.isActive ? `${a.startTime}-${a.endTime}` : '-'}
                     </span>
                   </div>
                 ))}

@@ -2,19 +2,28 @@
 
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, Clock, User, Scissors, CheckCircle2, XCircle, AlertCircle, Edit2, Trash2, Search, Filter } from 'lucide-react'
+import { User, CheckCircle2, XCircle, Search } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastContext'
 import Link from 'next/link'
 import { formatStoredDate } from '@/lib/booking-utils'
 
-export const AdminCitasClient = ({ initialAppointments }: { initialAppointments: any[] }) => {
+type AppointmentRow = {
+  id: string
+  date: string | Date
+  startTime: string
+  endTime: string
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED'
+  client?: { name?: string; email?: string }
+  barber?: { name?: string }
+  service?: { name?: string; price?: number }
+}
+
+export const AdminCitasClient = ({ initialAppointments }: { initialAppointments: AppointmentRow[] }) => {
   const [appointments, setAppointments] = useState(initialAppointments)
   const [filter, setFilter] = useState('')
   const { showToast } = useToast()
-  const [loadingId, setLoadingId] = useState<string | null>(null)
 
   const handleUpdateStatus = async (id: string, status: string) => {
-    setLoadingId(id)
     try {
       const res = await fetch(`/api/appointments/${id}`, {
         method: 'PUT',
@@ -30,8 +39,6 @@ export const AdminCitasClient = ({ initialAppointments }: { initialAppointments:
       }
     } catch {
       showToast('Error de red', 'error')
-    } finally {
-      setLoadingId(null)
     }
   }
 

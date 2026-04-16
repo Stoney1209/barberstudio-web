@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 import { prisma } from '@/lib/prisma'
 import { requireRole } from '@/lib/auth'
 import { Prisma, AppointmentStatus } from '@prisma/client'
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const authResult = await requireRole(['ADMIN'])
   if (authResult instanceof NextResponse) return authResult
 

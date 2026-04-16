@@ -1,16 +1,15 @@
 'use client'
 
 import React, { useState } from 'react'
-import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, Camera, Clock, DollarSign, Tag, CheckCircle } from 'lucide-react'
+import { Plus, Edit2, Trash2, Camera, Clock } from 'lucide-react'
 import { useToast } from '@/components/ui/ToastContext'
 
 type Service = {
   id: string
   name: string
   description: string | null
-  price: number | any // Decimal from Prisma can come as string or object
+  price: number | string // Decimal from Prisma can come as string
   duration: number
   imageUrl: string | null
   category: string

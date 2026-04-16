@@ -4,13 +4,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   TrendingUp, 
-  Calendar, 
-  Scissors, 
-  Users, 
   DollarSign, 
   Clock, 
-  CheckCircle2, 
-  AlertCircle 
+  CheckCircle2
 } from 'lucide-react'
 import { getLocalDateString, getStoredDateString } from '@/lib/booking-utils'
 

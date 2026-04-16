@@ -1,7 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import {
   hhmmToMinutes,
-  SLOT_STEP_MINUTES,
   isSlotAlignedToGrid,
 } from './booking-utils'
 

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { SignOutButton } from '@/components/ui/SignOutButton'
-import { LayoutDashboard, Calendar, Scissors, Package, Users, Home, LogOut, Clock } from 'lucide-react'
+import { LayoutDashboard, Calendar, Scissors, Package, Users, Home, Clock } from 'lucide-react'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -46,7 +46,7 @@ export const AdminSidebar: React.FC = () => {
         </div>
 
         <nav className="p-6 space-y-2 flex-1 overflow-y-auto relative custom-scrollbar">
-          {navItems.map((item, idx) => {
+          {navItems.map((item) => {
             const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))
             return (
               <Link

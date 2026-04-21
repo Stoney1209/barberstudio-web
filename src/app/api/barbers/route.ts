@@ -4,6 +4,9 @@ import { z } from 'zod'
 import { requireRole } from '@/lib/auth'
 import { parseOffsetPagination } from '@/lib/pagination'
 
+export const revalidate = 60
+
+
 const BarberInput = z.object({
   name: z.string().min(1),
   email: z.string().email(),

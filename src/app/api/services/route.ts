@@ -5,6 +5,9 @@ import { requireRole } from '@/lib/auth'
 import { parseOffsetPagination } from '@/lib/pagination'
 import { getWriteApiRatelimit } from '@/lib/rate-limit'
 
+export const revalidate = 60
+
+
 const ServiceInput = z.object({
   name: z.string().min(1),
   description: z.string().optional(),

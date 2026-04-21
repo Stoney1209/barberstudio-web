@@ -28,7 +28,7 @@ const AdminServiceEditor: React.FC<{ service: Service }> = ({ service }) => {
         <option value="FADE">FADE</option>
         <option value="BEARD">BEARD</option>
       </select>
-      <Button onClick={save} ariaLabel={`Guardar ${service.name}`}>Guardar</Button>
+      <Button onClick={save} aria-label={`Guardar ${service.name}`}>Guardar</Button>
     </div>
   )
 }

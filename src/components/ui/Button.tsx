@@ -13,6 +13,7 @@ type Props = {
   type?: 'button' | 'submit' | 'reset'
   className?: string
   fullWidth?: boolean
+  'aria-label'?: string
 }
 
 export const Button: React.FC<Props> = ({ 
@@ -24,7 +25,8 @@ export const Button: React.FC<Props> = ({
   disabled = false,
   type = 'button',
   className = '',
-  fullWidth = false
+  fullWidth = false,
+  'aria-label': ariaLabel
 }) => {
   const base = 'inline-flex items-center justify-center font-medium transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed'
   
@@ -48,6 +50,7 @@ export const Button: React.FC<Props> = ({
       type={type}
       onClick={onClick}
       disabled={disabled || loading}
+      aria-label={ariaLabel}
       className={`
         ${base} 
         ${variants[variant]} 

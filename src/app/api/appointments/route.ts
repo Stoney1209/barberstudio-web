@@ -160,7 +160,9 @@ export async function GET(req: NextRequest) {
 
     if (date) where.date = parseDateOnlyAsUTC(date)
 
-    if (status) where.status = status
+    if (status && ['PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED'].includes(status)) {
+      where.status = status as any
+    }
 
     if (forReview === 'true' && dbUser?.role === 'CLIENT') {
       where.status = 'COMPLETED'

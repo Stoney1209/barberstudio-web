@@ -1,7 +1,7 @@
 import React from 'react'
 import { prisma } from '@/lib/prisma'
 import AdminServicesClient from './AdminServicesClient'
-import type { Prisma } from '@prisma/client'
+
 
 async function getServices() {
   return prisma.service.findMany({
@@ -18,15 +18,11 @@ async function getServices() {
 }
 
 export default async function AdminServicios() {
-  const services = await getServices()
+  const rawServices = await getServices()
+  const services = rawServices.map(s => ({
+    ...s,
+    price: Number(s.price)
+  }))
 
-  return <AdminServicesClient initialServices={services as Prisma.ServiceGetPayload<{ select: {
-    id: true
-    name: true
-    description: true
-    price: true
-    duration: true
-    imageUrl: true
-    category: true
-  } }>[]} />
+  return <AdminServicesClient initialServices={services} />
 }

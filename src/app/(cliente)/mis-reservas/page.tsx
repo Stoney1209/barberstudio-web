@@ -25,6 +25,10 @@ export default async function MisCitasPage() {
   // Convert Decimal to Number for the client component
   const formattedAppointments = appointments.map(apt => ({
     ...apt,
+    barber: {
+      ...apt.barber,
+      name: apt.barber.name ?? 'Barbero'
+    },
     service: {
       ...apt.service,
       price: Number(apt.service.price)

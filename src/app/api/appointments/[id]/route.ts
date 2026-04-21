@@ -97,9 +97,10 @@ export async function PUT(req: NextRequest, ctx: { params: { id: string } }) {
     const body = await req.json()
     const parsed = AppointmentUpdate.parse(body)
 
-    const data: AppointmentUpdateData = { ...parsed }
-    if (parsed.date) {
-      data.date = parseDateOnlyAsUTC(parsed.date)
+    const { date, ...rest } = parsed
+    const data: AppointmentUpdateData = { ...rest }
+    if (date) {
+      data.date = parseDateOnlyAsUTC(date)
     }
 
     if (parsed.startTime && parsed.endTime) {

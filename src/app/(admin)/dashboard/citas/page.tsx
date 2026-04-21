@@ -14,13 +14,24 @@ export default async function AdminCitasPage() {
     orderBy: { date: 'desc' },
   })
 
-  // Format Decimal to Number for Client Component
+  // Format data to match AppointmentRow type
   const formattedAppointments = appointments.map(apt => ({
-    ...apt,
+    id: apt.id,
+    date: apt.date,
+    startTime: apt.startTime,
+    endTime: apt.endTime,
+    status: apt.status,
+    client: {
+      name: apt.client.name ?? undefined,
+      email: apt.client.email ?? undefined,
+    },
+    barber: {
+      name: apt.barber.name ?? undefined,
+    },
     service: apt.service ? {
-      ...apt.service,
-      price: Number(apt.service.price)
-    } : null
+      name: apt.service.name,
+      price: Number(apt.service.price),
+    } : undefined,
   }))
 
   return <AdminCitasClient initialAppointments={formattedAppointments} />

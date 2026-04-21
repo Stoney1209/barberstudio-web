@@ -23,7 +23,7 @@ export const AdminCitasClient = ({ initialAppointments }: { initialAppointments:
   const [filter, setFilter] = useState('')
   const { showToast } = useToast()
 
-  const handleUpdateStatus = async (id: string, status: string) => {
+  const handleUpdateStatus = async (id: string, status: AppointmentRow['status']) => {
     try {
       const res = await fetch(`/api/appointments/${id}`, {
         method: 'PUT',

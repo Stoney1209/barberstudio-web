@@ -8,7 +8,7 @@ import { PrintButton } from './PrintButton'
 
 export default async function TicketPage({ params }: { params: { id: string } }) {
   const { userId } = await auth()
-  if (!userId) redirect('/sign-in')
+  if (!userId) redirect('/login')
 
   const appointment = await prisma.appointment.findUnique({
     where: { id: params.id },

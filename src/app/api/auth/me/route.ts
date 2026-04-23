@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
-import { getSessionUser } from '@/lib/auth'
+import { ensureDbUser } from '@/lib/auth'
 
 export async function GET() {
   try {
-    const dbUser = await getSessionUser()
+    const dbUser = await ensureDbUser()
     if (!dbUser) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

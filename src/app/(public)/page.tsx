@@ -2,7 +2,7 @@ import React from 'react'
 import { prisma } from '@/lib/prisma'
 import { LandingContent } from '@/components/landing/LandingContent'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 3600 // revalidate every hour
 
 export default async function Landing() {
   const services = await prisma.service.findMany({

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   TrendingUp, 
@@ -8,18 +8,35 @@ import {
   Clock, 
   CheckCircle2
 } from 'lucide-react'
-import { getLocalDateString, getStoredDateString } from '@/lib/booking-utils'
 
-type Appointment = {
+type RecentAppointment = {
   id: string
-  client?: { name?: string; email?: string }
-  barber?: { name?: string }
-  service?: { name?: string; price?: number }
-  date?: string
-  startTime?: string
-  endTime?: string
-  status?: string
-  paymentStatus?: string
+  date: string
+  startTime: string
+  status: string
+  client?: string
+  barber?: string
+  service?: string
+}
+
+type StatsData = {
+  appointments: {
+    total: number
+    thisWeek: number
+    thisMonth: number
+    byStatus: Record<string, number>
+  }
+  revenue: {
+    total: number
+    thisWeek: number
+  }
+  users: {
+    clients: number
+    barbers: number
+  }
+  services: number
+  topServices: { serviceId: string; serviceName: string; count: number }[]
+  recentAppointments: RecentAppointment[]
 }
 
 type Barber = {
@@ -29,7 +46,7 @@ type Barber = {
 }
 
 const AdminDashboard: React.FC = () => {
-  const [appointments, setAppointments] = useState<Appointment[]>([])
+  const [stats, setStats] = useState<StatsData | null>(null)
   const [barbers, setBarbers] = useState<Barber[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'activity'>('overview')
@@ -37,14 +54,14 @@ const AdminDashboard: React.FC = () => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [apptRes, barberRes] = await Promise.all([
-          fetch('/api/appointments'),
+        const [statsRes, barberRes] = await Promise.all([
+          fetch('/api/admin/stats'),
           fetch('/api/barbers')
         ])
-        const apptData = await apptRes.json()
+        const statsData = await statsRes.json()
         const barberData = await barberRes.json()
         
-        setAppointments(apptData.appointments ?? [])
+        setStats(statsData)
         setBarbers(barberData.barbers ?? [])
       } catch (e) {
         console.error(e)
@@ -55,29 +72,18 @@ const AdminDashboard: React.FC = () => {
     fetchData()
   }, [])
 
-  const metrics = useMemo(() => {
-    const today = getLocalDateString(new Date())
-    
-    const dayTotal = appointments
-      .filter(a => a.date && getStoredDateString(a.date) === today && a.status === 'COMPLETED')
-      .reduce((acc, a) => acc + (Number(a.service?.price) ?? 0), 0)
-
-    const pending = appointments.filter(a => a.status === 'PENDING').length
-    const completed = appointments.filter(a => a.status === 'COMPLETED').length
-    
-    // Growth calculation (dummy for now but structured)
-    const growth = +12.5 
-
-    return { dayTotal, pending, completed, growth }
-  }, [appointments])
-
-  if (loading) {
+  if (loading || !stats) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="w-12 h-12 border-2 border-gold/10 border-t-gold rounded-full animate-spin shadow-glow" />
       </div>
     )
   }
+
+  const pending = stats.appointments.byStatus?.PENDING ?? 0
+  const completed = stats.appointments.byStatus?.COMPLETED ?? 0
+  const weeklyRevenue = stats.revenue.thisWeek
+  const totalRevenue = stats.revenue.total
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -149,19 +155,15 @@ const AdminDashboard: React.FC = () => {
                      <div className="w-8 h-8 rounded-full bg-gold/10 flex items-center justify-center">
                         <DollarSign size={14} className="text-gold" />
                      </div>
-                     <span className="text-xs text-muted/60 uppercase tracking-widest">Ingresos del Día</span>
+                     <span className="text-xs text-muted/60 uppercase tracking-widest">Ingresos Semanal</span>
                   </div>
                   
                   <div className="flex items-baseline gap-4">
-                    <h2 className="text-8xl font-display text-white">${metrics.dayTotal}</h2>
-                    <div className="flex items-center gap-1 text-green-400 text-sm font-medium">
-                       <TrendingUp size={14} />
-                       <span>{metrics.growth}%</span>
-                    </div>
+                    <h2 className="text-8xl font-display text-white">${weeklyRevenue}</h2>
                   </div>
                   
                   <p className="text-sm text-muted/40 mt-6 max-w-sm">
-                    Rendimiento financiero basado en servicios completados durante la jornada actual.
+                    Ingresos totales acumulados: <span className="text-gold font-medium">${totalRevenue}</span>
                   </p>
                 </div>
               </motion.div>
@@ -173,11 +175,11 @@ const AdminDashboard: React.FC = () => {
                       <span className="text-xs text-muted/60 uppercase tracking-widest">Pendientes</span>
                       <Clock size={16} className="text-yellow-500/60" />
                    </div>
-                   <p className="text-5xl font-display text-white group-hover:text-gold transition-colors">{metrics.pending}</p>
+                   <p className="text-5xl font-display text-white group-hover:text-gold transition-colors">{pending}</p>
                    <div className="h-1 w-full bg-white/5 mt-6 rounded-full overflow-hidden">
                       <motion.div 
                         initial={{ width: 0 }} 
-                        animate={{ width: '65%' }} 
+                        animate={{ width: stats.appointments.total > 0 ? `${Math.round((pending / stats.appointments.total) * 100)}%` : '0%' }} 
                         className="h-full bg-gold" 
                       />
                    </div>
@@ -188,8 +190,8 @@ const AdminDashboard: React.FC = () => {
                       <span className="text-xs text-muted/60 uppercase tracking-widest">Completadas</span>
                       <CheckCircle2 size={16} className="text-green-500/60" />
                    </div>
-                   <p className="text-5xl font-display text-white group-hover:text-gold transition-colors">{metrics.completed}</p>
-                   <p className="text-[10px] text-muted/40 mt-4 uppercase">Sincronizado hace 2 min</p>
+                   <p className="text-5xl font-display text-white group-hover:text-gold transition-colors">{completed}</p>
+                   <p className="text-[10px] text-muted/40 mt-4 uppercase">Esta semana: {stats.appointments.thisWeek}</p>
                 </motion.div>
               </div>
 
@@ -211,16 +213,22 @@ const AdminDashboard: React.FC = () => {
                   </div>
               </motion.div>
 
-              <motion.div variants={itemVariants} className="glass p-8 border-gold/5 bg-surface-2/40 md:col-span-2 flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-display text-gold mb-2 uppercase tracking-widest italic">Anuncio del Sistema</h3>
-                    <p className="text-sm text-muted/80 max-w-md">
-                      Recuerda revisar la disponibilidad de los barberos para el próximo fin de semana feriado.
-                    </p>
+              <motion.div variants={itemVariants} className="glass p-8 border-gold/5 bg-surface-2/40 md:col-span-2">
+                  <h3 className="text-sm font-display text-gold mb-6 uppercase tracking-widest italic">Servicios Más Populares</h3>
+                  <div className="space-y-3">
+                    {stats.topServices.map((s, idx) => (
+                      <div key={s.serviceId} className="flex items-center justify-between py-2 border-b border-gold/5 last:border-0">
+                        <div className="flex items-center gap-3">
+                          <span className="text-gold/40 text-xs font-mono w-6">#{idx + 1}</span>
+                          <span className="text-sm text-white/80">{s.serviceName}</span>
+                        </div>
+                        <span className="text-xs text-muted/60">{s.count} citas</span>
+                      </div>
+                    ))}
+                    {stats.topServices.length === 0 && (
+                      <p className="text-sm text-muted/40">Aún no hay datos suficientes</p>
+                    )}
                   </div>
-                  <button className="px-6 py-3 border border-gold/20 text-gold text-xs uppercase tracking-widest hover:bg-gold/5 transition-all">
-                    Revisar
-                  </button>
               </motion.div>
             </motion.div>
           ) : (
@@ -233,7 +241,7 @@ const AdminDashboard: React.FC = () => {
             >
                <h2 className="text-3xl font-display text-white mb-8">Actividad Reciente</h2>
                <div className="space-y-6">
-                  {appointments.slice(0, 8).map((apt, idx) => (
+                  {stats.recentAppointments.map((apt, idx) => (
                     <motion.div 
                       key={apt.id}
                       initial={{ opacity: 0, y: 10 }}
@@ -245,8 +253,8 @@ const AdminDashboard: React.FC = () => {
                           <div className="text-xs text-muted/40 font-mono">{apt.startTime}</div>
                           <div className="h-8 w-px bg-gold/10" />
                           <div>
-                            <p className="text-sm text-white font-medium">{apt.client?.name || 'Cliente Externo'}</p>
-                            <p className="text-[10px] text-muted/60 uppercase">{apt.service?.name}</p>
+                            <p className="text-sm text-white font-medium">{apt.client || 'Cliente Externo'}</p>
+                            <p className="text-[10px] text-muted/60 uppercase">{apt.service}</p>
                           </div>
                        </div>
                        <div className={`text-[10px] px-3 py-1 rounded-full uppercase tracking-widest font-bold ${

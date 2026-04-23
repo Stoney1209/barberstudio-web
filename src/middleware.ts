@@ -18,7 +18,6 @@ function shouldRateLimitPublicApi(pathname: string) {
 const isPublicRoute = (pathname: string) => {
   if (pathname === '/') return true
   if (pathname.startsWith('/login')) return true
-  if (pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up')) return true
   if (pathname.startsWith('/auth')) return true // For callback routes
   if (pathname.startsWith('/api/auth')) return true
   if (pathname.startsWith('/api/services')) return true

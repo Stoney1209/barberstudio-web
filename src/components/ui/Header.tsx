@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { SignOutButton } from '@/components/ui/SignOutButton'
+import { Menu, X } from 'lucide-react'
 import type { Session } from '@supabase/supabase-js'
 
 export const ClerkHeader: React.FC = () => {
@@ -96,10 +97,11 @@ export const ClerkHeader: React.FC = () => {
         </nav>
 
         <button
-          className="md:hidden text-white"
+          className="md:hidden text-white p-2"
           onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
         >
-          {menuOpen ? 'CLOSE' : 'MENU'}
+          {menuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 

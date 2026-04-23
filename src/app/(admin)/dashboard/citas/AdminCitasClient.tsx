@@ -9,7 +9,7 @@ import { formatStoredDate } from '@/lib/booking-utils'
 
 type AppointmentRow = {
   id: string
-  date: string | Date
+  date: string
   startTime: string
   endTime: string
   status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED'

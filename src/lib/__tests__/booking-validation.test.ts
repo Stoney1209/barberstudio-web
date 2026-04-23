@@ -1,4 +1,5 @@
-import { validateAppointmentTimeWindow, hhmmToMinutes, DEFAULT_WORKING_START_MIN, DEFAULT_WORKING_END_MIN } from '../booking-validation'
+import { validateAppointmentTimeWindow, DEFAULT_WORKING_START_MIN, DEFAULT_WORKING_END_MIN } from '../booking-validation'
+import { hhmmToMinutes } from '../booking-utils'
 
 describe('validateAppointmentTimeWindow', () => {
   it('accepts a slot inside default window with matching duration', () => {

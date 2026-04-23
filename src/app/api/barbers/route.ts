@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { requireRole } from '@/lib/auth'
 import { parseOffsetPagination } from '@/lib/pagination'
+import { getWriteApiRatelimit } from '@/lib/rate-limit'
 
 export const revalidate = 60
 
@@ -55,6 +56,21 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // SEC-2: Rate limit write operations
+  const rl = getWriteApiRatelimit()
+  if (rl) {
+    const forwarded = req.headers.get('x-forwarded-for')
+    const ip = forwarded?.split(',')[0]?.trim() ?? req.headers.get('x-real-ip') ?? 'unknown'
+    const { success, reset } = await rl.limit(`write:${ip}`)
+    if (!success) {
+      const retryAfter = Math.max(1, Math.ceil((reset - Date.now()) / 1000))
+      return NextResponse.json(
+        { error: 'Demasiadas solicitudes. Intenta de nuevo en unos segundos.' },
+        { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+      )
+    }
+  }
+
   const authResult = await requireRole(['ADMIN'])
   if (authResult instanceof NextResponse) return authResult
 
@@ -85,3 +101,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Error del servidor' }, { status: 500 })
   }
 }
+

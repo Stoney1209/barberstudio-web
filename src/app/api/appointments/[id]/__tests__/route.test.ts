@@ -74,7 +74,7 @@ describe('GET /api/appointments/[id]', () => {
 describe('PUT /api/appointments/[id]', () => {
   it('updates appointment when no conflict', async () => {
     p.appointment.findUnique.mockResolvedValue({ ...baseAppointment })
-    p.user.findUnique.mockResolvedValue({ id: 'test-user-id', role: 'CLIENT' })
+    p.user.findUnique.mockResolvedValue({ id: 'test-user-id', role: 'BARBER' })
     p.appointment.findFirst.mockResolvedValue(null)
     p.appointment.update.mockResolvedValue({ ...baseAppointment, status: 'CONFIRMED' })
 
@@ -91,7 +91,7 @@ describe('PUT /api/appointments/[id]', () => {
 
   it('returns 409 when time slot conflicts', async () => {
     p.appointment.findUnique.mockResolvedValue({ ...baseAppointment })
-    p.user.findUnique.mockResolvedValue({ id: 'test-user-id', role: 'CLIENT' })
+    p.user.findUnique.mockResolvedValue({ id: 'test-user-id', role: 'BARBER' })
     p.appointment.findFirst.mockResolvedValue({ id: 'other-apt' })
 
     const req = new NextRequest('http://localhost/api/appointments/apt-1', {

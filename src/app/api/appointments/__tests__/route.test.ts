@@ -8,7 +8,7 @@ const p = prisma as unknown as {
   user: { findUnique: jest.Mock; findMany: jest.Mock }
   service: { findUnique: jest.Mock }
   appointment: { findMany: jest.Mock; findFirst: jest.Mock; create: jest.Mock }
-  availability: { findFirst: jest.Mock; count: jest.Mock }
+  availability: { findFirst: jest.Mock; count: jest.Mock; findMany: jest.Mock }
   $transaction: jest.Mock
 }
 
@@ -22,6 +22,7 @@ describe('POST /api/appointments', () => {
   beforeEach(() => {
     p.availability.findFirst.mockResolvedValue(null)
     p.availability.count.mockResolvedValue(0)
+    p.availability.findMany.mockResolvedValue([])
     ;(requireAuth as jest.Mock).mockResolvedValue({ userId: 'test-user-id' })
   })
 
@@ -207,6 +208,7 @@ describe('POST /api/appointments', () => {
     const dateStr = tomorrowDateString()
     p.availability.count.mockResolvedValue(2)
     p.availability.findFirst.mockResolvedValue(null)
+    p.availability.findMany.mockResolvedValue([{ dayOfWeek: -1, startTime: '09:00', endTime: '18:00' }])
     p.user.findUnique.mockImplementation(async (args: { where: { id: string } }) => {
       if (args.where.id === 'b1') return { id: 'b1', role: 'BARBER' }
       if (args.where.id === 'test-user-id') return { id: 'test-user-id', role: 'CLIENT' }
@@ -235,14 +237,16 @@ describe('POST /api/appointments', () => {
   it('returns 400 when time is outside barber availability window', async () => {
     const dateStr = tomorrowDateString()
     p.availability.count.mockResolvedValue(1)
-    p.availability.findFirst.mockResolvedValue({
+    const mockAvail = {
       id: 'av1',
       barberId: 'b1',
       dayOfWeek: parseDateOnlyAsUTC(dateStr).getUTCDay(),
       startTime: '09:00',
       endTime: '12:00',
       isActive: true,
-    })
+    }
+    p.availability.findFirst.mockResolvedValue(mockAvail)
+    p.availability.findMany.mockResolvedValue([mockAvail])
     p.user.findUnique.mockImplementation(async (args: { where: { id: string } }) => {
       if (args.where.id === 'b1') return { id: 'b1', role: 'BARBER' }
       if (args.where.id === 'test-user-id') return { id: 'test-user-id', role: 'CLIENT' }

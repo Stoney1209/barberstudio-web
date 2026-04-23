@@ -9,11 +9,24 @@ export interface AuthenticatedUser {
   role: UserRole
 }
 
-export async function auth() {
+/**
+ * Lightweight auth check — returns the Supabase user ID if authenticated.
+ * Does NOT upsert the user into the database.
+ */
+export async function getSupabaseUser() {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user || !user.email) return { userId: null }
-  
+  return user
+}
+
+/**
+ * Ensures the authenticated user exists in our database.
+ * Should be called sparingly (login redirect, /api/auth/me), not on every request.
+ */
+export async function ensureDbUser() {
+  const user = await getSupabaseUser()
+  if (!user || !user.email) return null
+
   let defaultRole: UserRole = 'CLIENT'
   const adminString = (process.env.ADMIN_EMAILS || '').toLowerCase()
   if (adminString.includes(user.email.toLowerCase())) {
@@ -32,6 +45,28 @@ export async function auth() {
       role: defaultRole
     }
   })
+
+  return dbUser
+}
+
+/**
+ * Returns the authenticated user's DB id. Uses a simple findUnique instead of upsert.
+ * The user record is expected to already exist (created at login via ensureDbUser).
+ */
+export async function auth() {
+  const user = await getSupabaseUser()
+  if (!user || !user.email) return { userId: null }
+  
+  const dbUser = await prisma.user.findUnique({
+    where: { email: user.email },
+  })
+
+  if (!dbUser) {
+    // Fallback: user authenticated in Supabase but not in our DB yet.
+    // This can happen on first access after signup. Create the record.
+    const fallback = await ensureDbUser()
+    return { userId: fallback?.id ?? null }
+  }
 
   return { userId: dbUser.id }
 }

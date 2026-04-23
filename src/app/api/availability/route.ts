@@ -79,14 +79,11 @@ export async function GET(req: NextRequest) {
 
     const occupiedSlots: string[] = []
     appointments.forEach((apt) => {
-      let current = apt.startTime
-      while (current < apt.endTime) {
-        occupiedSlots.push(current)
-        const [h, m] = current.split(':').map(Number)
-        const nextM = m + SLOT_DURATION
-        const nextH = h + Math.floor(nextM / 60)
-        const nextMm = nextM % 60
-        current = `${String(nextH).padStart(2, '0')}:${String(nextMm).padStart(2, '0')}`
+      let currentMin = hhmmToMinutes(apt.startTime)
+      const endMin = hhmmToMinutes(apt.endTime)
+      while (currentMin < endMin) {
+        occupiedSlots.push(minutesToHHMM(currentMin))
+        currentMin += SLOT_DURATION
       }
     })
 
@@ -112,10 +109,9 @@ export async function GET(req: NextRequest) {
 
         if (i > 0) {
           const prevSlot = allSlots[index + i - 1]
-          const [ph, pm] = prevSlot.split(':').map(Number)
-          const [ch, cm] = nextSlot.split(':').map(Number)
-          const diff = ch * 60 + cm - (ph * 60 + pm)
-          if (diff !== SLOT_DURATION) return false
+          const prevMin = hhmmToMinutes(prevSlot)
+          const currMin = hhmmToMinutes(nextSlot)
+          if (currMin - prevMin !== SLOT_DURATION) return false
         }
       }
 

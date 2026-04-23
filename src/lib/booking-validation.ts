@@ -4,14 +4,6 @@ import {
   isSlotAlignedToGrid,
 } from './booking-utils'
 
-export {
-  hhmmToMinutes,
-  minutesToHHMM,
-  slotStartsInWindow,
-  getLocalDateString,
-  isSlotAlignedToGrid,
-} from './booking-utils'
-
 /** Debe coincidir con el fallback histórico en `src/app/api/availability/route.ts` */
 export const DEFAULT_WORKING_START_MIN = 9 * 60
 export const DEFAULT_WORKING_END_MIN = 21 * 60
@@ -23,34 +15,37 @@ export type BarberDayWindow =
 /**
  * Si el barbero tiene al menos un horario activo en BD, solo abre los días con registro explícito.
  * Si no tiene ninguno, se usa el horario por defecto 9:00–21:00 todos los días (onboarding).
+ *
+ * Optimized: single query fetching all active availabilities for this barber,
+ * then checking in-memory if the specific day is present.
  */
 export async function resolveBarberDayWindow(barberId: string, appointmentDate: Date): Promise<BarberDayWindow> {
   const dayOfWeek = appointmentDate.getUTCDay()
 
-  const configuredActive = await prisma.availability.count({
+  const activeAvailabilities = await prisma.availability.findMany({
     where: { barberId, isActive: true },
+    select: { dayOfWeek: true, startTime: true, endTime: true },
   })
 
-  const row = await prisma.availability.findFirst({
-    where: { barberId, dayOfWeek, isActive: true },
-  })
-
-  if (configuredActive > 0 && !row) {
-    return { status: 'closed' }
-  }
-
-  if (row) {
+  if (activeAvailabilities.length === 0) {
+    // No configured schedule — use default hours for all days (onboarding)
     return {
       status: 'open',
-      startMin: hhmmToMinutes(row.startTime),
-      endMin: hhmmToMinutes(row.endTime),
+      startMin: DEFAULT_WORKING_START_MIN,
+      endMin: DEFAULT_WORKING_END_MIN,
     }
+  }
+
+  const row = activeAvailabilities.find(a => a.dayOfWeek === dayOfWeek)
+
+  if (!row) {
+    return { status: 'closed' }
   }
 
   return {
     status: 'open',
-    startMin: DEFAULT_WORKING_START_MIN,
-    endMin: DEFAULT_WORKING_END_MIN,
+    startMin: hhmmToMinutes(row.startTime),
+    endMin: hhmmToMinutes(row.endTime),
   }
 }
 

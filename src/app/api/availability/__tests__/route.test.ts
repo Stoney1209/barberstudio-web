@@ -13,6 +13,7 @@ describe('GET /api/availability', () => {
   beforeEach(() => {
     p.availability.count.mockResolvedValue(0)
     p.availability.findFirst.mockResolvedValue(null)
+    p.appointment.findMany.mockResolvedValue([])
   })
   it('returns 400 when barberId is missing', async () => {
     const req = new NextRequest('http://localhost/api/availability?date=2026-06-15')
@@ -44,6 +45,7 @@ describe('GET /api/availability', () => {
     p.user.findUnique.mockResolvedValue({ id: 'b1', name: 'Barber' })
     p.availability.count.mockResolvedValue(1)
     p.availability.findFirst.mockResolvedValue(null)
+    p.availability.findMany.mockResolvedValue([{ dayOfWeek: -1, startTime: '09:00', endTime: '18:00' }])
 
     const req = new NextRequest('http://localhost/api/availability?barberId=b1&date=2026-06-15')
     const res = await GET(req)
@@ -56,6 +58,7 @@ describe('GET /api/availability', () => {
 
   it('computes available slots excluding booked times', async () => {
     p.user.findUnique.mockResolvedValue({ id: 'b1', name: 'Barber' })
+    p.availability.findMany.mockResolvedValue([])
     p.appointment.findMany.mockResolvedValue([
       { startTime: '10:00', endTime: '10:30' },
     ])

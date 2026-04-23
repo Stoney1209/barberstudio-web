@@ -17,7 +17,7 @@ export default async function AdminCitasPage() {
   // Format data to match AppointmentRow type
   const formattedAppointments = appointments.map(apt => ({
     id: apt.id,
-    date: apt.date,
+    date: apt.date.toISOString(),
     startTime: apt.startTime,
     endTime: apt.endTime,
     status: apt.status,

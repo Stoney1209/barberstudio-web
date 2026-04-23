@@ -2,7 +2,6 @@ import React from 'react'
 import { getSessionUser } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
-import '@/styles/globals.css'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const dbUser = await getSessionUser()

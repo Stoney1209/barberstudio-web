@@ -9,7 +9,7 @@ import { formatStoredDate } from '@/lib/booking-utils'
 
 type Appointment = {
   id: string
-  date: Date
+  date: string
   startTime: string
   endTime: string
   status: string

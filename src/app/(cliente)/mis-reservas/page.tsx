@@ -10,7 +10,7 @@ export default async function MisCitasPage() {
   const { userId } = await auth()
   
   if (!userId) {
-    redirect('/sign-in')
+    redirect('/login')
   }
 
   const appointments = await prisma.appointment.findMany({
@@ -25,6 +25,7 @@ export default async function MisCitasPage() {
   // Convert Decimal to Number for the client component
   const formattedAppointments = appointments.map(apt => ({
     ...apt,
+    date: apt.date.toISOString(),
     barber: {
       ...apt.barber,
       name: apt.barber.name ?? 'Barbero'

@@ -208,7 +208,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-muted/30 text-xs mt-8">
-          © 2024 BarberStudio · El arte de la barberia
+          © {new Date().getFullYear()} BarberStudio · El arte de la barberia
         </p>
       </motion.div>
     </div>

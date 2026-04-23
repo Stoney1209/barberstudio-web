@@ -65,8 +65,8 @@ async function canAccessAppointment(
 }
 
 // ─── GET /api/appointments/[id] ───────────────────────────────────────────────
-export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
-  const { id } = ctx.params
+export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params
 
   // Fix 2: requerir sesión
   const authResult = await requireAuth()
@@ -81,8 +81,8 @@ export async function GET(req: NextRequest, ctx: { params: { id: string } }) {
 }
 
 // ─── PUT /api/appointments/[id] ───────────────────────────────────────────────
-export async function PUT(req: NextRequest, ctx: { params: { id: string } }) {
-  const { id } = ctx.params
+export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params
 
   // Fix 2: requerir sesión
   const authResult = await requireAuth()
@@ -96,6 +96,23 @@ export async function PUT(req: NextRequest, ctx: { params: { id: string } }) {
   try {
     const body = await req.json()
     const parsed = AppointmentUpdate.parse(body)
+
+    // SEC-1: Restrict what a CLIENT can modify
+    const dbUser = await prisma.user.findUnique({ where: { id: userId } })
+    const isClient = dbUser?.role === 'CLIENT'
+
+    if (isClient) {
+      // Clients can only cancel their own appointment or update notes
+      if (parsed.status && parsed.status !== 'CANCELLED') {
+        return NextResponse.json({ error: 'Solo puedes cancelar tu cita' }, { status: 403 })
+      }
+      if (parsed.paymentStatus) {
+        return NextResponse.json({ error: 'No tienes permiso para cambiar el estado de pago' }, { status: 403 })
+      }
+      if (parsed.date || parsed.startTime || parsed.endTime) {
+        return NextResponse.json({ error: 'No tienes permiso para reagendar. Cancela y crea una nueva cita.' }, { status: 403 })
+      }
+    }
 
     const { date, ...rest } = parsed
     const data: AppointmentUpdateData = { ...rest }
@@ -144,8 +161,8 @@ export async function PUT(req: NextRequest, ctx: { params: { id: string } }) {
 }
 
 // ─── DELETE /api/appointments/[id] ────────────────────────────────────────────
-export async function DELETE(req: NextRequest, ctx: { params: { id: string } }) {
-  const { id } = ctx.params
+export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params
 
   // Fix 2: requerir sesión
   const authResult = await requireAuth()

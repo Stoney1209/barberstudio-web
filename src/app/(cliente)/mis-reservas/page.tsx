@@ -32,7 +32,7 @@ export default async function MisCitasPage() {
     },
     service: {
       ...apt.service,
-      price: Number(apt.service.price)
+      price: apt.service ? Number(apt.service.price) : 0
     }
   }))
 

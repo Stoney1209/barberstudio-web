@@ -14,6 +14,7 @@ if (fs.existsSync('.env.local')) {
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   datasource: {
-    url: process.env.DATABASE_URL || 'postgresql://barber:barber@127.0.0.1:5432/barberstudio',
+    url: process.env.DATABASE_URL,
+    directUrl: process.env.DIRECT_URL,
   },
 });

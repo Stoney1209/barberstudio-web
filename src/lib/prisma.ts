@@ -11,7 +11,12 @@ if (!connectionString) {
   throw new Error('DATABASE_URL is not set')
 }
 
-const pool = new Pool({ connectionString })
+const pool = new Pool({ 
+  connectionString,
+  max: 1, // Crucial for serverless functions (Vercel) to avoid exhausting connections
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+})
 const adapter = new PrismaPg(pool)
 
 export const prisma =
@@ -21,6 +26,5 @@ export const prisma =
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   })
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma
-}
+// Cache the client even in production for warm start reuse
+globalForPrisma.prisma = prisma

@@ -15,5 +15,10 @@ export default async function Landing() {
     include: { client: true }
   })
 
-  return <LandingContent initialServices={services} initialReviews={reviews} />
+  const formattedServices = services.map(s => ({
+    ...s,
+    price: Number(s.price)
+  }))
+
+  return <LandingContent initialServices={formattedServices} initialReviews={reviews} />
 }

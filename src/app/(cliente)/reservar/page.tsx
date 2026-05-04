@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Stepper from '@/components/booking/Stepper'
 import { useToast } from '@/components/ui/ToastContext'
+import { useRouter } from 'next/navigation'
 
 type ServiceOption = { id: string; name: string; duration: number; price: number; category: string }
 type BarberOption = { id: string; name: string }
@@ -17,6 +18,7 @@ const ReservarPage: React.FC = () => {
   const [services, setServices] = useState<ServiceOption[]>([])
   const [barbers, setBarbers] = useState<BarberOption[]>([])
   const { showToast } = useToast()
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -65,10 +67,10 @@ const ReservarPage: React.FC = () => {
         showToast('Error al procesar la reserva', 'error')
         return
       }
-      showToast('¡Cita agendada con éxito!', 'success')
-      setTimeout(() => {
-         window.location.href = '/mis-reservas'
-      }, 2000)
+       showToast('¡Cita agendada con éxito!', 'success')
+       setTimeout(() => {
+          router.push('/mis-reservas')
+       }, 2000)
     } catch {
       showToast('Error de conexión', 'error')
     }

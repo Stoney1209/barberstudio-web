@@ -8,7 +8,7 @@ import { SignOutButton } from '@/components/ui/SignOutButton'
 import { Menu, X } from 'lucide-react'
 import type { Session } from '@supabase/supabase-js'
 
-export const ClerkHeader: React.FC = () => {
+export const Header: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [session, setSession] = useState<Session | null>(null)
@@ -133,4 +133,4 @@ export const ClerkHeader: React.FC = () => {
   )
 }
 
-export default ClerkHeader
+export default Header

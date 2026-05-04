@@ -6,7 +6,7 @@ type Service = {
   id: string
   name: string
   description: string | null
-  price: number | string
+  price: number
   duration: number
   category: string
 }

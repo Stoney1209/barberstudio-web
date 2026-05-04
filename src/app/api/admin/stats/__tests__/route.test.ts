@@ -3,20 +3,21 @@ import { requireRole } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { GET } from '../route'
 
-const p = prisma as unknown as {
-  user: { findUnique: jest.Mock; count: jest.Mock }
-  appointment: {
-    count: jest.Mock
-    groupBy: jest.Mock
-    findMany: jest.Mock
-  }
-  service: { count: jest.Mock; findMany: jest.Mock }
-  $queryRaw: jest.Mock
-}
+// Mock modules
+jest.mock('@/lib/auth')
+jest.mock('@/lib/prisma')
+
+const mockedRequireRole = requireRole as jest.MockedFunction<typeof requireRole>
+const mockedPrisma = prisma as jest.Mocked<typeof prisma>
 
 describe('GET /api/admin/stats', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('returns 403 for non-admin', async () => {
-    (requireRole as jest.Mock).mockResolvedValueOnce(
+    // Mock requireRole to return a NextResponse (403)
+    mockedRequireRole.mockResolvedValueOnce(
       NextResponse.json({ error: 'Prohibido' }, { status: 403 })
     )
 
@@ -26,15 +27,17 @@ describe('GET /api/admin/stats', () => {
   })
 
   it('returns aggregated stats for ADMIN', async () => {
-    (requireRole as jest.Mock).mockResolvedValueOnce({ userId: 'admin-1', role: 'ADMIN' })
+    // Mock requireRole to return an authenticated user
+    mockedRequireRole.mockResolvedValueOnce({ userId: 'admin-1', role: 'ADMIN' })
 
-    p.appointment.count.mockResolvedValueOnce(100).mockResolvedValueOnce(5).mockResolvedValueOnce(20)
-    p.appointment.groupBy.mockResolvedValueOnce([
+    // Mock Prisma calls
+    mockedPrisma.appointment.count.mockResolvedValueOnce(100).mockResolvedValueOnce(5).mockResolvedValueOnce(20)
+    mockedPrisma.appointment.groupBy.mockResolvedValueOnce([
       { status: 'CONFIRMED', _count: 10 },
       { status: 'COMPLETED', _count: 5 },
     ])
-    p.user.count.mockResolvedValueOnce(30).mockResolvedValueOnce(3)
-    p.service.count.mockResolvedValue(8)
+    mockedPrisma.user.count.mockResolvedValueOnce(30).mockResolvedValueOnce(3)
+    mockedPrisma.service.count.mockResolvedValue(8)
 
     const recent = [
       {
@@ -47,12 +50,12 @@ describe('GET /api/admin/stats', () => {
         service: { name: 'Fade', price: 25 },
       },
     ]
-    p.appointment.findMany.mockResolvedValueOnce(recent)
+    mockedPrisma.appointment.findMany.mockResolvedValueOnce(recent)
 
-    p.$queryRaw.mockResolvedValueOnce([{ sum: 30 }]).mockResolvedValueOnce([{ sum: 15 }])
+    mockedPrisma.$queryRaw.mockResolvedValueOnce([{ sum: 30 }]).mockResolvedValueOnce([{ sum: 15 }])
 
-    p.appointment.groupBy.mockResolvedValueOnce([{ serviceId: 's1', _count: 7 }])
-    p.service.findMany.mockResolvedValue([{ id: 's1', name: 'Fade' }])
+    mockedPrisma.appointment.groupBy.mockResolvedValueOnce([{ serviceId: 's1', _count: 7 }])
+    mockedPrisma.service.findMany.mockResolvedValue([{ id: 's1', name: 'Fade' }])
 
     const req = new NextRequest('http://localhost/api/admin/stats')
     const res = await GET(req)

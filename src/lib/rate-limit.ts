@@ -14,6 +14,7 @@ export function getPublicApiRatelimit(): Ratelimit | null {
   const url = process.env.UPSTASH_REDIS_REST_URL
   const token = process.env.UPSTASH_REDIS_REST_TOKEN
   if (!url || !token) {
+    console.warn('⚠️ Rate limiting disabled for public API: Upstash Redis credentials not configured')
     publicApiRatelimit = null
     return null
   }
@@ -37,6 +38,7 @@ export function getWriteApiRatelimit(): Ratelimit | null {
   const url = process.env.UPSTASH_REDIS_REST_URL
   const token = process.env.UPSTASH_REDIS_REST_TOKEN
   if (!url || !token) {
+    console.warn('⚠️ Rate limiting disabled for write API: Upstash Redis credentials not configured')
     writeApiRatelimit = null
     return null
   }

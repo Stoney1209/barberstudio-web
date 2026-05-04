@@ -1,5 +1,5 @@
 import React from 'react';
-import ClerkHeader from '@/components/ui/Header'
+import Header from '@/components/ui/Header'
 import LayoutWrapper from '@/components/ui/LayoutWrapper'
 import '@/styles/globals.css';
 import { Metadata } from 'next'
@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Saltar al contenido principal
           </a>
           <div className="flex flex-col min-h-screen">
-            <ClerkHeader />
+            <Header />
             <LayoutWrapper>
               {children}
             </LayoutWrapper>

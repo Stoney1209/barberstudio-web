@@ -19,9 +19,22 @@ const CACHE_MAX_AGE = 30 // seconds
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const barberId = searchParams.get('barberId')
-    const date = searchParams.get('date')
-    const durationRequested = parseInt(searchParams.get('duration') || '30', 10)
+    
+    // Validate query parameters
+    const queryValidation = AvailabilityQuery.safeParse({
+      barberId: searchParams.get('barberId'),
+      date: searchParams.get('date'),
+      duration: searchParams.get('duration')
+    })
+    
+    if (!queryValidation.success) {
+      return NextResponse.json(
+        { error: 'Parámetros de consulta inválidos', details: queryValidation.error.flatten() },
+        { status: 400 }
+      )
+    }
+    
+    const { barberId, date, duration } = queryValidation.data
 
     if (!barberId) {
       return NextResponse.json({ error: 'Parámetro requerido: barberId' }, { status: 400 })
@@ -48,15 +61,15 @@ export async function GET(req: NextRequest) {
 
     if (dayWindow.status === 'closed') {
       return NextResponse.json(
-        {
-          barber,
-          date,
-          durationRequested,
-          closedDay: true,
-          message: 'El barbero no atiende este día',
-          workingHours: null,
-          availableSlots: [],
-        },
+         {
+           barber,
+           date,
+           duration,
+           closedDay: true,
+           message: 'El barbero no atiende este día',
+           workingHours: null,
+           availableSlots: [],
+         },
         {
           headers: {
             'Cache-Control': `public, max-age=${CACHE_MAX_AGE}, s-maxage=${CACHE_MAX_AGE}`,
@@ -100,7 +113,7 @@ export async function GET(req: NextRequest) {
 
       if (occupiedSlots.includes(slot)) return false
 
-      const slotsNeeded = Math.ceil(durationRequested / SLOT_DURATION)
+       const slotsNeeded = Math.ceil(duration / SLOT_DURATION)
       if (slotsNeeded <= 1) return true
 
       for (let i = 0; i < slotsNeeded; i++) {
@@ -119,15 +132,15 @@ export async function GET(req: NextRequest) {
     })
 
     return NextResponse.json(
-      {
-        barber,
-        date,
-        durationRequested,
-        closedDay: false,
-        workingHours: {
-          start: minutesToHHMM(startMin),
-          end: minutesToHHMM(endMin),
-        },
+         {
+           barber,
+           date,
+           duration,
+           closedDay: false,
+           workingHours: {
+             start: minutesToHHMM(startMin),
+             end: minutesToHHMM(endMin),
+           },
         availableSlots,
       },
       {
@@ -148,6 +161,13 @@ const AvailabilityInput = z.object({
   startTime: z.string().regex(/^\d{2}:\d{2}$/),
   endTime: z.string().regex(/^\d{2}:\d{2}$/),
   isActive: z.boolean().optional(),
+})
+
+// Validation for GET query parameters
+const AvailabilityQuery = z.object({
+  barberId: z.string().uuid(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  duration: z.string().regex(/^\d+$/).transform(Number).default("30")
 })
 
 export async function POST(req: NextRequest) {

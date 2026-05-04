@@ -25,7 +25,7 @@ export const Select = forwardRef<HTMLSelectElement, Props>(({
   id,
   ...props
 }, ref) => {
-  const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`
+  const selectId = id || `select-${Math.random().toString(36).substring(2, 11)}`
   
   return (
     <div className="w-full">

@@ -1,5 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 type GalleryItem = {
   id: string
@@ -84,19 +85,20 @@ export default function GalleryPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {displayItems.map((item, index) => (
-              <div
-                key={item.id}
-                className="group relative aspect-square overflow-hidden rounded-lg bg-surface-2 cursor-pointer animate-fade-in-scale"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                <div className="absolute inset-0">
-                  <img 
-                    src={item.imageUrl} 
-                    alt={item.caption || item.category}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                </div>
+{displayItems.map((item, index) => (
+  <div
+    key={item.id}
+    className="group relative aspect-square overflow-hidden rounded-lg bg-surface-2 cursor-pointer animate-fade-in-scale"
+    style={{ animationDelay: `${index * 50}ms` }}
+  >
+    <div className="absolute inset-0">
+<Image 
+  src={item.imageUrl} 
+  alt={item.caption || `Corte de categoría ${item.category}`}
+  fill
+  className="object-cover transition-transform duration-700 group-hover:scale-110"
+/>
+    </div>
                 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
                   <div className="absolute bottom-0 left-0 right-0 p-4">

@@ -6,6 +6,25 @@ import { parseOffsetPagination } from '@/lib/pagination'
 import { resolveBarberDayWindow, validateAppointmentTimeWindow } from '@/lib/booking-validation'
 import { getLocalDateString, parseDateOnlyAsUTC } from '@/lib/booking-utils'
 import type { Prisma } from '@prisma/client'
+import { getWriteApiRatelimit } from '@/lib/rate-limit'
+
+async function checkRateLimit(req: NextRequest): Promise<NextResponse | null> {
+  const rl = getWriteApiRatelimit()
+  if (!rl) return null
+
+  const forwarded = req.headers.get('x-forwarded-for')
+  const ip = forwarded?.split(',')[0]?.trim() ?? req.headers.get('x-real-ip') ?? 'unknown'
+  const { success, reset } = await rl.limit(`write:${ip}`)
+  
+  if (!success) {
+    const retryAfter = Math.max(1, Math.ceil((reset - Date.now()) / 1000))
+    return NextResponse.json(
+      { error: 'Demasiadas solicitudes. Intenta de nuevo en unos segundos.' },
+      { status: 429, headers: { 'Retry-After': String(retryAfter) } }
+    )
+  }
+  return null
+}
 
 // ── Fix 3: clientId ya NO se acepta desde el body — se toma de la sesión ──
 const AppointmentInput = z.object({
@@ -34,6 +53,9 @@ export async function POST(req: NextRequest) {
   const authResult = await requireAuth()
   if (authResult instanceof NextResponse) return authResult
   const { userId } = authResult
+
+  const rateLimitError = await checkRateLimit(req)
+  if (rateLimitError) return rateLimitError
 
   try {
     const body = await req.json()

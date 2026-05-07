@@ -3,6 +3,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Scissors, Star, ArrowRight, Quote } from 'lucide-react'
 
 type Review = {
@@ -118,8 +119,8 @@ export const LandingContent: React.FC<Props> = ({ initialReviews }) => {
             viewport={{ once: true }}
             className="relative"
           >
-            <div className="aspect-[4/5] bg-surface-elevated overflow-hidden border border-gold/10">
-              <img src="/images/service-fade.png" className="w-full h-full object-cover grayscale opacity-80" alt="The Craft" />
+            <div className="aspect-[4/5] bg-surface-elevated overflow-hidden border border-gold/10 relative">
+              <Image src="/images/service-fade.png" fill className="object-cover grayscale opacity-80" alt="The Craft" />
             </div>
             <div className="absolute -bottom-12 -right-12 glass p-12 border border-gold/20 hidden md:block">
               <h3 className="text-4xl font-display text-gold italic">01. El Oficio</h3>
@@ -181,7 +182,7 @@ export const LandingContent: React.FC<Props> = ({ initialReviews }) => {
                 className="group cursor-pointer"
               >
                 <div className="aspect-[4/5] bg-surface mb-6 overflow-hidden relative border border-gold/5 group-hover:border-gold/30 transition-all duration-700">
-                  <img src={s.img} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" alt={s.name} />
+                  <Image src={s.img} fill className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" alt={s.name} />
                   <div className="absolute top-6 left-6">
                     <span className="px-3 py-1 bg-black/90 text-gold text-[8px] uppercase tracking-widest font-black border border-gold/20">
                       {s.cat}

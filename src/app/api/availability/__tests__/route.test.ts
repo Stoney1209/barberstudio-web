@@ -25,7 +25,7 @@ describe('GET /api/availability', () => {
     const rows = [{ id: 'a1', barberId: 'b1', dayOfWeek: 1, startTime: '09:00', endTime: '17:00' }]
     p.availability.findMany.mockResolvedValue(rows)
 
-    const req = new NextRequest('http://localhost/api/availability?barberId=b1')
+    const req = new NextRequest('http://localhost/api/availability?barberId=00000000-0000-0000-0000-000000000001')
     const res = await GET(req)
     const body = await res.json()
 
@@ -36,7 +36,7 @@ describe('GET /api/availability', () => {
   it('returns 404 when barber does not exist', async () => {
     p.user.findUnique.mockResolvedValue(null)
 
-    const req = new NextRequest('http://localhost/api/availability?barberId=missing&date=2026-06-15')
+    const req = new NextRequest('http://localhost/api/availability?barberId=00000000-0000-0000-0000-000000000002&date=2026-06-15')
     const res = await GET(req)
     expect(res.status).toBe(404)
   })
@@ -47,7 +47,7 @@ describe('GET /api/availability', () => {
     p.availability.findFirst.mockResolvedValue(null)
     p.availability.findMany.mockResolvedValue([{ dayOfWeek: -1, startTime: '09:00', endTime: '18:00' }])
 
-    const req = new NextRequest('http://localhost/api/availability?barberId=b1&date=2026-06-15')
+    const req = new NextRequest('http://localhost/api/availability?barberId=00000000-0000-0000-0000-000000000001&date=2026-06-15')
     const res = await GET(req)
     const body = await res.json()
 
@@ -63,7 +63,7 @@ describe('GET /api/availability', () => {
       { startTime: '10:00', endTime: '10:30' },
     ])
 
-    const req = new NextRequest('http://localhost/api/availability?barberId=b1&date=2026-06-15')
+    const req = new NextRequest('http://localhost/api/availability?barberId=00000000-0000-0000-0000-000000000001&date=2026-06-15')
     const res = await GET(req)
     const body = await res.json()
 
@@ -82,7 +82,7 @@ describe('POST /api/availability', () => {
     const req = new NextRequest('http://localhost/api/availability', {
       method: 'POST',
       body: JSON.stringify({
-        barberId: 'b1',
+        barberId: '00000000-0000-0000-0000-000000000001',
         dayOfWeek: 1,
         startTime: '09:00',
         endTime: '17:00',
@@ -102,7 +102,7 @@ describe('POST /api/availability', () => {
     const req = new NextRequest('http://localhost/api/availability', {
       method: 'POST',
       body: JSON.stringify({
-        barberId: 'b1',
+        barberId: '00000000-0000-0000-0000-000000000001',
         dayOfWeek: 1,
         startTime: '09:00',
         endTime: '17:00',
@@ -129,7 +129,7 @@ describe('POST /api/availability', () => {
     const req = new NextRequest('http://localhost/api/availability', {
       method: 'POST',
       body: JSON.stringify({
-        barberId: 'b1',
+        barberId: '00000000-0000-0000-0000-000000000001',
         dayOfWeek: 2,
         startTime: '10:00',
         endTime: '18:00',

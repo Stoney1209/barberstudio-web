@@ -166,8 +166,8 @@ const AvailabilityInput = z.object({
 // Validation for GET query parameters
 const AvailabilityQuery = z.object({
   barberId: z.string().uuid(),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  duration: z.string().regex(/^\d+$/).transform(Number).default("30")
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
+  duration: z.string().regex(/^\d+$/).nullable().transform(val => val ? Number(val) : 30)
 })
 
 export async function POST(req: NextRequest) {

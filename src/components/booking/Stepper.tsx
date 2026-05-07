@@ -251,6 +251,8 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         key={s.id} 
+                        aria-pressed={serviceId === s.id}
+                        aria-label={`Seleccionar servicio ${s.name}`}
                         onClick={() => { setServiceId(s.id); setServiceName(s.name); setServicePrice(s.price); setServiceCategory(s.category); setDuration(s.duration) }} 
                         className={`p-5 rounded-xl border transition-all text-left group ${serviceId === s.id ? 'border-gold bg-gold/5' : 'border-gold/10 hover:border-gold/30'}`}
                       >
@@ -291,6 +293,8 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       key={b.id} 
+                      aria-pressed={barberId === b.id}
+                      aria-label={`Seleccionar barbero ${b.name}`}
                       onClick={() => { setBarberId(b.id); setBarberName(b.name); setTime('') }} 
                       className={`p-5 rounded-xl border transition-all text-left flex items-center gap-4 ${barberId === b.id ? 'border-gold bg-gold/5' : 'border-gold/10 hover:border-gold/30'}`}
                     >
@@ -341,6 +345,8 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
                           return (
                             <button 
                               key={i} 
+                              aria-current={isSelected ? 'date' : undefined}
+                              aria-label={`Seleccionar fecha ${d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' })}`}
                               onClick={() => { setDate(dateStr); setTime('') }} 
                               disabled={disabled} 
                               className={`p-3 rounded-lg text-center transition-all ${isSelected ? 'bg-gold text-primary' : disabled ? 'bg-surface-2/50 text-muted/30 cursor-not-allowed' : 'bg-surface-2 border border-gold/10 hover:border-gold/30 text-white'}`}
@@ -366,7 +372,7 @@ export const Stepper: React.FC<Props> = ({ onComplete, services = [], barbers = 
                       ) : availableSlots.length > 0 ? (
                         <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
                           {availableSlots.map((slot) => (
-                            <button key={slot.time} onClick={() => setTime(slot.time)} disabled={!slot.available} className={`p-3 rounded-lg text-center transition-all font-medium ${time === slot.time ? 'bg-gold text-primary' : slot.available ? 'bg-surface-2 border border-gold/10 hover:border-gold/30 text-white' : 'bg-surface-2/50 text-muted/30 line-through cursor-not-allowed'}`}>
+                            <button key={slot.time} aria-pressed={time === slot.time} aria-label={`Seleccionar hora ${slot.time}`} onClick={() => setTime(slot.time)} disabled={!slot.available} className={`p-3 rounded-lg text-center transition-all font-medium ${time === slot.time ? 'bg-gold text-primary' : slot.available ? 'bg-surface-2 border border-gold/10 hover:border-gold/30 text-white' : 'bg-surface-2/50 text-muted/30 line-through cursor-not-allowed'}`}>
                               {slot.time}
                             </button>
                           ))}

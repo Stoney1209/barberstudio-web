@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Edit2, Trash2, Camera, Clock } from 'lucide-react'
+import Image from 'next/image'
 import { useToast } from '@/components/ui/ToastContext'
 
 type Service = {
@@ -129,11 +130,11 @@ export default function AdminServicesClient({ initialServices }: { initialServic
                 className="glass p-1 group flex flex-col md:flex-row relative border-gold/5 hover:border-gold/20 transition-all duration-700"
               >
                  {/* Left Image Area */}
-                 <div className="w-full md:w-48 h-48 bg-surface-elevated overflow-hidden relative border-r border-gold/5">
-                    {s.imageUrl ? (
-                      <img src={s.imageUrl} alt={s.name} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-1000" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center opacity-10">
+                   <div className="w-full md:w-48 h-48 bg-surface-elevated overflow-hidden relative border-r border-gold/5">
+                      {s.imageUrl ? (
+                        <Image src={s.imageUrl} alt={s.name} fill className="object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-1000" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center opacity-10">
                          <Camera size={40} className="text-gold" />
                       </div>
                     )}
